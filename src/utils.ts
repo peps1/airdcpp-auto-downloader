@@ -122,4 +122,4 @@ export const searchQueryDefinitions = [
     default_value: 0,
     type: 'number',
   }
-],
+];
