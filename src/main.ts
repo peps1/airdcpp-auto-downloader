@@ -115,21 +115,7 @@ export default (socket: APISocket, extension: any) => {
     const args = command.slice(1);
 
     if (text === '/help') {
-      const helpText = `
-
-        User commands
-
-        /uptime\tShow uptime (Client & System)\t\t\t(public, visible to everyone)
-        /speed\tShow current network Upload/Download speed\t\t\t(public, visible to everyone)
-        /os\t\tShow the operating system\t\t\t(public, visible to everyone)
-        /stats\t\tShow various stats (Client, Uptime, Ratio, CPU)\t\t\t(public, visible to everyone)
-        /ratio\t\tShow Upload/Download stats\t\t\t(public, visible to everyone)
-        /sratio\tShow Session Upload/Download stats\t\t\t(public, visible to everyone)
-        /version\tShow user-commands extension version\t\t\t(private, visible only to yourself)
-        /list username /share/folder - List all items within a users shared folder, writing items to local file\t\t\t(private, visible only to yourself)
-
-      `
-      printStatusMessage(helpText, type, message.session_id)
+      return null;
     }
     return null;
   };
@@ -141,21 +127,6 @@ export default (socket: APISocket, extension: any) => {
 
 		switch (command) {
 			case 'help': {
-        const helpText = `
-
-        User commands
-
-        /uptime\tShow uptime (Client & System)\t\t\t(public, visible to everyone)
-        /speed\tShow current network Upload/Download speed\t\t\t(public, visible to everyone)
-        /os\t\tShow the operating system\t\t\t(public, visible to everyone)
-        /stats\t\tShow various stats (Client, Uptime, Ratio, CPU)\t\t\t(public, visible to everyone)
-        /ratio\t\tShow Upload/Download stats\t\t\t(public, visible to everyone)
-        /sratio\tShow Session Upload/Download stats\t\t\t(public, visible to everyone)
-        /version\tShow user-commands extension version\t\t\t(private, visible only to yourself)
-        /list username /share/folder - List all items within a users shared folder, writing items to local file\t\t\t(private, visible only to yourself)
-
-        `;
-        printStatusMessage(helpText, type, entityId)
         break;
 			}
 		}
