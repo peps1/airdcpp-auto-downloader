@@ -123,3 +123,44 @@ export const searchQueryDefinitions = [
     type: 'number',
   }
 ];
+
+// Default settings
+export const SettingDefinitions = [
+  {
+    key: 'search_interval',
+    title: 'Search interval (minutes)',
+    default_value: 5,
+    type: 'number',
+  }, {
+    key: 'search_items',
+    title: 'Search items',
+    optional: true,
+    default_value: [
+      {
+        pattern: 'ubuntu-install',
+        extensions: 'iso;img',
+        priority: 3,
+        file_type: 'any',
+      }
+    ],
+    type: 'list',
+    item_type: 'struct',
+    definitions: [
+      ...searchQueryDefinitions,
+      {
+        key: 'priority',
+        title: 'Priority',
+        default_value: 3,
+        type: 'number',
+        options: priorityEnum,
+      }, {
+        key: 'target_directory',
+        title: 'Target directory',
+        default_value: '',
+        type: 'directory_path',
+        help: 'Leave empty to use the default download directory',
+        optional: true,
+      },
+    ]
+  }
+];

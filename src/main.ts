@@ -1,66 +1,24 @@
 'use strict';
 
-import os from 'os';
-import * as Utils from './utils';
-import fs from 'fs';
+import * as utils from './utils';
+import searchItem from './search';
 import type { APISocket } from 'airdcpp-apisocket';
+
 const CONFIG_VERSION = 1;
 
 // Settings manager docs: https://github.com/airdcpp-web/airdcpp-extension-settings-js
 import SettingsManager from 'airdcpp-extension-settings';
 
+
 export default (socket: APISocket, extension: any) => {
 
-  // Default settings
-  const SettingDefinitions = [
-    {
-      key: 'search_interval',
-      title: 'Search interval (minutes)',
-      default_value: 5,
-      type: 'number',
-    }, {
-      key: 'search_items',
-      title: 'Search items',
-      optional: true,
-      default_value: [
-        {
-          pattern: 'ubuntu-install',
-          extensions: 'iso;img',
-          priority: 3,
-          file_type: 'any',
-        }
-      ],
-      type: 'list',
-      item_type: 'struct',
-      definitions: [
-        ...Utils.searchQueryDefinitions,
-        {
-          key: 'priority',
-          title: 'Priority',
-          default_value: 3,
-          type: 'number',
-          options: Utils.priorityEnum,
-        }, {
-          key: 'target_directory',
-          title: 'Target directory',
-          default_value: '',
-          type: 'directory_path',
-          help: 'Leave empty to use the default download directory',
-          optional: true,
-        },
-      ]
-    }
-  ];
-
-	// INITIALIZATION
-	const settings = SettingsManager(socket, {
-		extensionName: extension.name,
-		configFile: extension.configPath + 'config.json',
-		configVersion: CONFIG_VERSION,
-		definitions: [
-			...SettingDefinitions,
-		],
-	});
+  // INITIALIZATION
+  const settings = SettingsManager(socket, {
+    extensionName: extension.name,
+    configFile: extension.configPath + 'config.json',
+    configVersion: CONFIG_VERSION,
+    definitions: utils.SettingDefinitions,
+  });
 
   // https://airdcpp.docs.apiary.io/#reference/private-chat-sessions/methods/send-status-message
   // https://airdcpp.docs.apiary.io/#reference/hub-sessions/messages/send-status-message
@@ -155,8 +113,9 @@ export default (socket: APISocket, extension: any) => {
 
   };
 
-
+  let searchInterval: ReturnType<typeof setInterval>;
   extension.onStart = async (sessionInfo: any) => {
+
 
     await settings.load();
 
@@ -171,5 +130,22 @@ export default (socket: APISocket, extension: any) => {
       socket.addHook('hubs', 'hub_outgoing_message_hook', onOutgoingHubMessage, subscriberInfo);
       socket.addHook('private_chat', 'private_chat_outgoing_message_hook', onOutgoingPrivateMessage, subscriberInfo);
     }
+
+		// Set interval
+		searchInterval = setInterval(() => {
+      searchItem(socket, extension, settings);
+    }, settings.getValue('search_interval') * 60 * 1000, [socket, extension, settings]);
+
+    // Perform an instant search as well
+    // TODO: enable instant search - needs some debugging
+		// searchItem(socket, extension, settings);
+
+
   };
+
+	extension.onStop = () => {
+		// We can't search without a socket
+		clearInterval(searchInterval);
+	};
+
 };
