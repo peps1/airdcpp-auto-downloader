@@ -87,21 +87,22 @@ export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export const parseSearchQuery = (item: { pattern: any; extensions: string; file_type: any; min_size: number; }) => {
+export const parseSearchQuery = (item: { pattern_list: any; extensions: string; file_type: any; min_size: number; }) => {
   return {
-    pattern: item.pattern,
+    pattern: item.pattern_list.split('\n'),
     extensions: item.extensions.split(';'),
     file_type: item.file_type,
-    min_size: item.min_size * 1024 * 1024,
+    min_size: item.min_size * 1024 * 1024, // MiB
   };
 };
 
 export const searchQueryDefinitions = [
   {
-    key: 'pattern',
-    title: 'Search string',
+    key: 'pattern_list',
+    title: 'Search list',
     default_value: '',
-    type: 'string',
+    type: 'text',
+    help: 'One search item/pattern per line',
     optional: true,
   }, {
     key: 'extensions',
@@ -137,7 +138,7 @@ export const SettingDefinitions = [
     optional: true,
     default_value: [
       {
-        pattern: 'ubuntu-install',
+        pattern_list: 'ubuntu-install\nfedora-install',
         extensions: 'iso;img',
         priority: 3,
         file_type: 'any',

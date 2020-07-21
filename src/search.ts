@@ -9,8 +9,13 @@ const searchItem = async (socket: APISocket, extension: any, settings: any) => {
   }
 
   // Get a random item to search for
+  // TODO: pick random item, check item against recently searched list, if on list pick another, add item to list of recently searched (save in settings.json)
+  // TODO: when all items already on recently searched list, delete oldest items from list (oldest N)
+  // TODO: How can sort through they json? https://stackoverflow.com/questions/3859239/sort-json-by-date ?
   const pos = Math.floor(Math.random() * itemCount);
   const item = settings.getValue('search_items')[pos];
+
+  // The item might actually be a list of items
 
   // Create instance
   const instance: any = await socket.post('search');
@@ -27,7 +32,7 @@ const searchItem = async (socket: APISocket, extension: any, settings: any) => {
 
   // Show log message for the user
   socket.post('events', {
-    text: `Auto downloader: the item ${item.pattern} was searched for from ${searchQueueInfo.queued_count} hubs`,
+    text: `Auto downloader: the item ${item.pattern_list} was searched for from ${searchQueueInfo.queued_count} hubs`,
     severity: 'info',
   });
 };
