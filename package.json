@@ -20,13 +20,14 @@
     "url": "https://github.com/peps1/airdcpp-auto-downloader"
   },
   "scripts": {
-    "build": "tsc && npm run clean && cross-env NODE_ENV=production webpack",
+    "build": "npm run lint && tsc && npm run clean && cross-env NODE_ENV=production webpack",
     "clean": "rimraf dist",
     "dev": "ts-node-dev --respawn --transpileOnly ./src/main.ts",
     "start": "node devtools/watch.js ../dist/main.js",
     "test": "nyc mocha -r ts-node/register src/tests/*.ts",
     "posttest": "nyc report --reporter=json",
     "prepublishOnly": "npm run build",
+    "lint": "eslint .",
     "webpack": "webpack"
   },
   "devDependencies": {
