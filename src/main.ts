@@ -47,7 +47,7 @@ export default (socket: APISocket, fileExtension: any) => {
       searchItem(fileExtension);
     }, globalThis.SETTINGS.getValue('search_interval') * 60 * 1000, [fileExtension]);
 
-    // Perform an instant search as well
+    // Perform an instant search on start
     // TODO: enable instant search - needs some debugging
 		// searchItem(socket, extension, settings);
 

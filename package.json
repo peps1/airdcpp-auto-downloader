@@ -58,6 +58,7 @@
     "eslint-plugin-jsdoc": "^30.7.3",
     "eslint-plugin-prefer-arrow": "^1.2.2",
     "eslint-plugin-react": "^7.21.5",
+    "husky": "^4.3.0",
     "mocha": "^8.2.0",
     "nodemon": "^2.0.6",
     "nyc": "^15.1.0",
@@ -71,6 +72,12 @@
   },
   "main": "dist/main",
   "types": "dist/main",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test",
+      "pre-push": "npm test"
+    }
+  },
   "airdcpp": {
     "apiVersion": 1,
     "minApiFeatureLevel": 0
