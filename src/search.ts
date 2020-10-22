@@ -1,6 +1,7 @@
+import { printEvent } from './log';
 import * as utils from './utils';
 
-const searchItem = async (fileExtension: any) => {
+export const searchItem = async (fileExtension: any) => {
   // Anything to search for?
   const itemCount = globalThis.SETTINGS.getValue('search_items').length;
   if (itemCount === 0) {
@@ -11,7 +12,9 @@ const searchItem = async (fileExtension: any) => {
   // TODO: pick random item, check item against recently searched list, if on list pick another, add item to list of recently searched (save in settings.json)
   // TODO: when all items already on recently searched list, delete oldest items from list (oldest N)
   // TODO: How can sort through the json? https://stackoverflow.com/questions/3859239/sort-json-by-date ?
+  // TODO: iterate through whole item list per search_interval
   const pos = Math.floor(Math.random() * itemCount);
+
   const item = globalThis.SETTINGS.getValue('search_items')[pos];
 
   // The item might actually be a list of items
@@ -24,16 +27,48 @@ const searchItem = async (fileExtension: any) => {
     onSearchSent(item, instance, unsubscribe, searchInfo);
   }, instance.id);
 
+  const pattern = getNextPatternFromItem(item, pos);
+
+  // TODO: REMOVE
+  // eslint-disable-next-line no-console
+  console.log(globalThis.SEARCH_HISTORY);
+
+  if (!pattern) {
+    // TODO: implement proper way to clear search history
+    printEvent('All items have been already searched, no more searches to do.', 'info');
+    return;
+  }
+
+  const query = utils.parseSearchQuery(item, pattern[0]);
+
   // Perform the actual search
   const searchQueueInfo: any = await globalThis.SOCKET.post(`search/${instance.id}/hub_search`, {
-    query: utils.parseSearchQuery(item),
+    query
   });
 
   // Show log message for the user
-  globalThis.SOCKET.post('events', {
-    text: `Auto downloader: the item ${item.pattern_list} was searched for from ${searchQueueInfo.queued_count} hubs`,
-    severity: 'info',
-  });
+  printEvent(`The item ${pattern[1]} was searched for from ${searchQueueInfo.queued_count} hubs`, 'info');
+
+};
+
+export const getNextPatternFromItem = (queryItem: any, pos: number): [number, string]|undefined => {
+  for (const [index, singlePattern] of queryItem.pattern_list.split('\n').entries()) {
+
+    if (globalThis.SEARCH_HISTORY[pos]) {
+      if (globalThis.SEARCH_HISTORY[pos].includes(singlePattern)) {
+        // skip item if already in list
+        continue;
+      } else {
+        globalThis.SEARCH_HISTORY[pos].push(singlePattern);
+        return [index, singlePattern];
+      }
+    } else {
+      globalThis.SEARCH_HISTORY[pos] = [];
+      globalThis.SEARCH_HISTORY[pos].push(singlePattern);
+      return [index, singlePattern];
+    }
+  }
+  return;
 };
 
 const onSearchSent = async (item: any, instance: any, unsubscribe: any, searchInfo: any) => {
@@ -59,5 +94,3 @@ const onSearchSent = async (item: any, instance: any, unsubscribe: any, searchIn
   // Remove listener for this search instance
   unsubscribe();
 };
-
-export default searchItem;

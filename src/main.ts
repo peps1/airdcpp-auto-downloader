@@ -2,7 +2,7 @@
 
 import * as utils from './utils';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
-import searchItem from './search';
+import { searchItem } from './search';
 import type { APISocket } from 'airdcpp-apisocket';
 
 const CONFIG_VERSION = 1;
@@ -14,6 +14,8 @@ import SettingsManager from 'airdcpp-extension-settings';
 export default (socket: APISocket, fileExtension: any) => {
 
   globalThis.SOCKET = socket;
+  // TODO: save search history in settings
+  globalThis.SEARCH_HISTORY = {};
 
   // INITIALIZATION
   globalThis.SETTINGS = SettingsManager(socket, {

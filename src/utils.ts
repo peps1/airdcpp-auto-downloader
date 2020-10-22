@@ -75,7 +75,6 @@ export const formatSize = (fileSizeInBytes: number): string => {
   return result;
 };
 
-
 // Works only for directories
 export const getLastDirectory = (fullPath: string) => {
   const result = fullPath.match(/([^/]+)[/]?$/);
@@ -87,9 +86,9 @@ export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export const parseSearchQuery = (item: { pattern_list: any; extensions: string; file_type: any; min_size: number; }) => {
+export const parseSearchQuery = (item: { pattern_list: any; extensions: string; file_type: any; min_size: number; }, itemIndex = 0) => {
   return {
-    pattern: item.pattern_list.split('\n'),
+    pattern: item.pattern_list.split('\n')[itemIndex],
     extensions: item.extensions.split(';'),
     file_type: item.file_type,
     min_size: item.min_size * 1024 * 1024, // MiB

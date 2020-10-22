@@ -2,3 +2,4 @@
 
 declare var SOCKET: any;
 declare var SETTINGS: any;
+declare var SEARCH_HISTORY: any;
