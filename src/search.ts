@@ -3,7 +3,7 @@ import * as utils from './utils';
 
 export const searchItem = async (fileExtension: any) => {
   // Anything to search for?
-  const itemCount = globalThis.SETTINGS.getValue('search_items').length;
+  const itemCount = global.SETTINGS.getValue('search_items').length;
   if (itemCount === 0) {
     return;
   }
@@ -15,15 +15,15 @@ export const searchItem = async (fileExtension: any) => {
   // TODO: iterate through whole item list per search_interval
   const pos = Math.floor(Math.random() * itemCount);
 
-  const item = globalThis.SETTINGS.getValue('search_items')[pos];
+  const item = global.SETTINGS.getValue('search_items')[pos];
 
   // The item might actually be a list of items
 
   // Create instance
-  const instance: any = await globalThis.SOCKET.post('search');
+  const instance: any = await global.SOCKET.post('search');
 
   // Add instance-specific listener for results
-  const unsubscribe = await globalThis.SOCKET.addListener('search', 'search_hub_searches_sent', (searchInfo: any) => {
+  const unsubscribe = await global.SOCKET.addListener('search', 'search_hub_searches_sent', (searchInfo: any) => {
     onSearchSent(item, instance, unsubscribe, searchInfo);
   }, instance.id);
 
@@ -31,7 +31,7 @@ export const searchItem = async (fileExtension: any) => {
 
   // TODO: REMOVE
   // eslint-disable-next-line no-console
-  console.log(globalThis.SEARCH_HISTORY);
+  console.log(global.SEARCH_HISTORY);
 
   if (!pattern) {
     // TODO: implement proper way to clear search history
@@ -42,7 +42,7 @@ export const searchItem = async (fileExtension: any) => {
   const query = utils.parseSearchQuery(item, pattern[0]);
 
   // Perform the actual search
-  const searchQueueInfo: any = await globalThis.SOCKET.post(`search/${instance.id}/hub_search`, {
+  const searchQueueInfo: any = await global.SOCKET.post(`search/${instance.id}/hub_search`, {
     query
   });
 
@@ -54,17 +54,17 @@ export const searchItem = async (fileExtension: any) => {
 export const getNextPatternFromItem = (queryItem: any, pos: number): [number, string]|undefined => {
   for (const [index, singlePattern] of queryItem.pattern_list.split('\n').entries()) {
 
-    if (globalThis.SEARCH_HISTORY[pos]) {
-      if (globalThis.SEARCH_HISTORY[pos].includes(singlePattern)) {
+    if (global.SEARCH_HISTORY[pos]) {
+      if (global.SEARCH_HISTORY[pos].includes(singlePattern)) {
         // skip item if already in list
         continue;
       } else {
-        globalThis.SEARCH_HISTORY[pos].push(singlePattern);
+        global.SEARCH_HISTORY[pos].push(singlePattern);
         return [index, singlePattern];
       }
     } else {
-      globalThis.SEARCH_HISTORY[pos] = [];
-      globalThis.SEARCH_HISTORY[pos].push(singlePattern);
+      global.SEARCH_HISTORY[pos] = [];
+      global.SEARCH_HISTORY[pos].push(singlePattern);
       return [index, singlePattern];
     }
   }
@@ -77,7 +77,7 @@ const onSearchSent = async (item: any, instance: any, unsubscribe: any, searchIn
 
   // Get only the first result (results are sorted by relevance)
   // TODO: we might want to have more results
-  const results: any = await globalThis.SOCKET.get(`search/${instance.id}/results/0/1`);
+  const results: any = await global.SOCKET.get(`search/${instance.id}/results/0/1`);
 
   // TODO: try for a bit longer if no results yet
   if (results.length > 0) {
@@ -85,7 +85,7 @@ const onSearchSent = async (item: any, instance: any, unsubscribe: any, searchIn
     // TODO: we might want to download multiple
     // TODO: multiple results might only make sense for directory downloads? Or TV seasons? Maybe config setting "allow multiple results"
     const result = results[0];
-    globalThis.SOCKET.post(`search/${instance.id}/results/${result.id}/download`, {
+    global.SOCKET.post(`search/${instance.id}/results/${result.id}/download`, {
       priority: item.priority,
       target_directory: item.target_directory,
     });

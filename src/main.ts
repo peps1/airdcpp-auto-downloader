@@ -13,12 +13,12 @@ import SettingsManager from 'airdcpp-extension-settings';
 
 export default (socket: APISocket, fileExtension: any) => {
 
-  globalThis.SOCKET = socket;
+  global.SOCKET = socket;
   // TODO: save search history in settings
-  globalThis.SEARCH_HISTORY = {};
+  global.SEARCH_HISTORY = {};
 
   // INITIALIZATION
-  globalThis.SETTINGS = SettingsManager(socket, {
+  global.SETTINGS = SettingsManager(socket, {
     extensionName: fileExtension.name,
     configFile: fileExtension.configPath + 'config.json',
     configVersion: CONFIG_VERSION,
@@ -29,7 +29,7 @@ export default (socket: APISocket, fileExtension: any) => {
   fileExtension.onStart = async (sessionInfo: any) => {
 
 
-    await globalThis.SETTINGS.load();
+    await global.SETTINGS.load();
 
     const subscriberInfo = {
       id: 'auto_downloader',
@@ -47,7 +47,7 @@ export default (socket: APISocket, fileExtension: any) => {
 		// Set interval
 		searchInterval = setInterval(() => {
       searchItem(fileExtension);
-    }, globalThis.SETTINGS.getValue('search_interval') * 60 * 1000, [fileExtension]);
+    }, global.SETTINGS.getValue('search_interval') * 60 * 1000, [fileExtension]);
 
     // Perform an instant search on start
     // TODO: enable instant search - needs some debugging

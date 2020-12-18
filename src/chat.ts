@@ -4,7 +4,7 @@ import { printEvent, printStatusMessage } from './log';
 // https://airdcpp.docs.apiary.io/#reference/private-chat-sessions/methods/send-chat-message
 export const sendChatMessage = (chatMessage: string, type: string, entityId: string|number) => {
   try {
-    globalThis.SOCKET.post(`${type}/${entityId}/chat_message`, {
+    global.SOCKET.post(`${type}/${entityId}/chat_message`, {
       text: chatMessage,
     });
   } catch (e) {

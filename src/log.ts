@@ -4,7 +4,7 @@ declare const EXTENSION_NAME: string;
 // https://airdcpp.docs.apiary.io/#reference/hub-sessions/messages/send-status-message
 export const printStatusMessage = async (statusMessage: string, type: string, entityId: string|number) => {
   try {
-    globalThis.SOCKET.post(`${type}/${entityId}/status_message`, {
+    global.SOCKET.post(`${type}/${entityId}/status_message`, {
       text: statusMessage,
       severity: 'info',
     });
@@ -19,7 +19,7 @@ export const printStatusMessage = async (statusMessage: string, type: string, en
 // Messages will appear as popups and in the Events Log
 // https://airdcpp.docs.apiary.io/#reference/events
 export const printEvent = async (eventMessage: string, severity: string) => {
-  globalThis.SOCKET.post('events', {
+  global.SOCKET.post('events', {
     text: `[${EXTENSION_NAME}] ${eventMessage}`,
     severity,
   });
