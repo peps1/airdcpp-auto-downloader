@@ -1,6 +1,20 @@
 import { printEvent } from './log';
 import * as utils from './utils';
 
+// Save the results
+const results: any = [];
+
+const onSearchResultAdded = (result: any) => {
+  results.push(result.result);
+};
+
+const onSearchResultUpdated = (result: any) => {
+  const toReplaceIndex = results.findIndex((element: any) => {
+    return element.id === result.result.id;
+  });
+  results[toReplaceIndex] = result.result;
+};
+
 export const searchItem = async (fileExtension: any) => {
   // Anything to search for?
   const itemCount = global.SETTINGS.getValue('search_items').length;
@@ -10,8 +24,6 @@ export const searchItem = async (fileExtension: any) => {
 
   // Get a random item to search for
   // TODO: pick random item, check item against recently searched list, if on list pick another, add item to list of recently searched (save in settings.json)
-  // TODO: when all items already on recently searched list, delete oldest items from list (oldest N)
-  // TODO: How can sort through the json? https://stackoverflow.com/questions/3859239/sort-json-by-date ?
   // TODO: iterate through whole item list per search_interval
   const pos = Math.floor(Math.random() * itemCount);
 
@@ -19,27 +31,37 @@ export const searchItem = async (fileExtension: any) => {
 
   // The item might actually be a list of items
 
-  // Create instance
-  const instance: any = await global.SOCKET.post('search');
+  // Get instance
+  const instance: any = global.SEARCH_INSTANCE;
 
-  // Add instance-specific listener for results
-  const unsubscribe = await global.SOCKET.addListener('search', 'search_hub_searches_sent', (searchInfo: any) => {
-    onSearchSent(item, instance, unsubscribe, searchInfo);
-  }, instance.id);
-
-  const pattern = getNextPatternFromItem(item, pos);
-
-  // TODO: REMOVE
-  // eslint-disable-next-line no-console
-  console.log(global.SEARCH_HISTORY);
+  // Get next item to search
+  let pattern = getNextPatternFromItem(item, pos);
 
   if (!pattern) {
-    // TODO: implement proper way to clear search history
-    printEvent('All items have been already searched, no more searches to do.', 'info');
-    return;
+    requeueOldestSearches();
+    // Get next item to search
+    pattern = getNextPatternFromItem(item, pos);
+    if (!pattern) {
+      return;
+    }
   }
 
-  const query = utils.parseSearchQuery(item, pattern[0]);
+  // add result listener
+  const removeResultAddedListener = await global.SOCKET.addListener(
+    'search',
+    'search_result_added',
+    onSearchResultAdded,
+    instance.id
+  );
+  const removeResultUpdatedListener = await global.SOCKET.addListener(
+    'search',
+    'search_result_updated',
+    onSearchResultUpdated,
+    instance.id
+  );
+
+  // build search payload
+  const query = utils.buildSearchQuery(item, pattern[0]);
 
   // Perform the actual search
   const searchQueueInfo: any = await global.SOCKET.post(`search/${instance.id}/hub_search`, {
@@ -49,48 +71,68 @@ export const searchItem = async (fileExtension: any) => {
   // Show log message for the user
   printEvent(`The item ${pattern[1]} was searched for from ${searchQueueInfo.queued_count} hubs`, 'info');
 
-};
 
-export const getNextPatternFromItem = (queryItem: any, pos: number): [number, string]|undefined => {
-  for (const [index, singlePattern] of queryItem.pattern_list.split('\n').entries()) {
+  // Collect the results for some time
+  let waited = 0;
+  while (results.length <= 1) {
+    // sleep 2 seconds
+    await utils.sleep(2000);
+    waited = waited + 2;
 
-    if (global.SEARCH_HISTORY[pos]) {
-      if (global.SEARCH_HISTORY[pos].includes(singlePattern)) {
-        // skip item if already in list
-        continue;
-      } else {
-        global.SEARCH_HISTORY[pos].push(singlePattern);
-        return [index, singlePattern];
-      }
-    } else {
-      global.SEARCH_HISTORY[pos] = [];
-      global.SEARCH_HISTORY[pos].push(singlePattern);
-      return [index, singlePattern];
+    if (waited >= 20) {
+      break;
     }
   }
-  return;
-};
 
-const onSearchSent = async (item: any, instance: any, unsubscribe: any, searchInfo: any) => {
-  // Collect the results for 5 seconds
-  await utils.sleep(5000);
+  const result = results[0];
 
-  // Get only the first result (results are sorted by relevance)
-  // TODO: we might want to have more results
-  const results: any = await global.SOCKET.get(`search/${instance.id}/results/0/1`);
-
-  // TODO: try for a bit longer if no results yet
-  if (results.length > 0) {
-    // We have results, download the best one
-    // TODO: we might want to download multiple
-    // TODO: multiple results might only make sense for directory downloads? Or TV seasons? Maybe config setting "allow multiple results"
-    const result = results[0];
+  if (result) {
     global.SOCKET.post(`search/${instance.id}/results/${result.id}/download`, {
       priority: item.priority,
       target_directory: item.target_directory,
     });
   }
 
-  // Remove listener for this search instance
-  unsubscribe();
+  // Remove the Listeners
+  await removeResultAddedListener();
+  await removeResultUpdatedListener();
+
+};
+
+export const getNextPatternFromItem = (queryItem: any, pos: number): [number, string]|undefined => {
+  // read item list
+  for (const [index, singlePattern] of queryItem.pattern_list.split('\n').entries()) {
+
+    let skipItem = false;
+    for (const item of global.SEARCH_HISTORY) {
+      if (item.name.includes(singlePattern)) {
+        // skip item if already in list
+        skipItem = true;
+      }
+    }
+
+    if (!skipItem) {
+      global.SEARCH_HISTORY.push({
+        name: singlePattern,
+        timestamp: new Date()
+      });
+      return [index, singlePattern];
+    }
+  }
+  return;
+};
+
+// requeue all items that are older than the search interval
+const requeueOldestSearches = async () => {
+
+  const searchSchedule = global.SETTINGS.getValue('search_interval') * 60 * 1000;
+  const timeAgo = Date.now() - searchSchedule;
+
+  for (const item of global.SEARCH_HISTORY) {
+    if (item.timestamp < new Date(timeAgo)) {
+      // older than X minutes
+      global.SEARCH_HISTORY.splice(global.SEARCH_HISTORY.indexOf(item));
+    }
+  }
+
 };

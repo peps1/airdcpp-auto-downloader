@@ -1,5 +1,8 @@
 /* eslint-disable no-var */
 
-declare var SOCKET: any;
+type SearchHistory = import('./types').SearchHistory;
+
+declare var SEARCH_HISTORY: SearchHistory[];
+declare var SEARCH_INSTANCE: any;
 declare var SETTINGS: any;
-declare var SEARCH_HISTORY: any;
+declare var SOCKET: any;

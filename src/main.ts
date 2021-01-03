@@ -15,7 +15,7 @@ export default (socket: APISocket, fileExtension: any) => {
 
   global.SOCKET = socket;
   // TODO: save search history in settings
-  global.SEARCH_HISTORY = {};
+  global.SEARCH_HISTORY = [];
 
   // INITIALIZATION
   global.SETTINGS = SettingsManager(socket, {
@@ -30,6 +30,8 @@ export default (socket: APISocket, fileExtension: any) => {
 
 
     await global.SETTINGS.load();
+    // currently reusing the same search instance for all searches
+    global.SEARCH_INSTANCE = await global.SOCKET.post('search');
 
     const subscriberInfo = {
       id: 'auto_downloader',
