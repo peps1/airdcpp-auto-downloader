@@ -86,7 +86,7 @@ export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export const parseSearchQuery = (item: { pattern_list: any; extensions: string; file_type: any; min_size: number; }, itemIndex = 0) => {
+export const buildSearchQuery = (item: { pattern_list: any; extensions: string; file_type: any; min_size: number; }, itemIndex = 0) => {
   return {
     pattern: item.pattern_list.split('\n')[itemIndex],
     extensions: item.extensions.split(';'),

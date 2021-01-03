@@ -3,12 +3,12 @@ import { describe, it } from 'mocha';
 // import sinon from 'sinon';
 import assert from 'assert';
 
-import { formatSize, getLastDirectory, sleep , parseSearchQuery } from '../utils';
+import { formatSize, getLastDirectory, sleep , buildSearchQuery } from '../utils';
 
 
-describe('parseSearchQuery', () => {
+describe('buildSearchQuery', () => {
   it('Should properly parsed search queries', () => {
-    expect(parseSearchQuery({
+    expect(buildSearchQuery({
       pattern_list: 'Something1-Searching\nSomething-Else',
       extensions: '.mp3;.mov',
       file_type: 'Folder',
