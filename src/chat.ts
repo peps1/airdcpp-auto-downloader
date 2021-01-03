@@ -21,8 +21,9 @@ const checkLegacyChatCommand = async (message: any, type: string) => {
     return null;
   }
 
-  const command = message.text.split(' ');
-  const args = command.slice(1);
+  // currently not used
+  // const command = message.text.split(' ');
+  // const args = command.slice(1);
 
   if (text === '/help') {
     return null;
@@ -33,7 +34,8 @@ const checkLegacyChatCommand = async (message: any, type: string) => {
 // entityId is the session_id used to reference the current chat session
 // example https://airdcpp.docs.apiary.io/#reference/private-chat-sessions/methods/send-chat-message
 const checkChatCommand = async (type: string, data: any, entityId: string|number) => {
-  const { command, args } = data;
+  // const { command, args } = data;
+  const { command } = data;
 
   switch (command) {
     case 'help': {
