@@ -137,10 +137,16 @@ export const SettingDefinitions = [
     optional: true,
     default_value: [
       {
-        pattern_list: 'ubuntu-install\nfedora-install',
+        pattern_list: 'ubuntu server amd64\nfedora-install',
         extensions: 'iso;img',
-        priority: 3,
-        file_type: 'any',
+        priority: 0,
+        file_type: 'file',
+      },
+      {
+        pattern_list: 'manjaro-architect\ngrml64-small',
+        extensions: 'iso;img',
+        priority: 0,
+        file_type: 'file',
       }
     ],
     type: 'list',
