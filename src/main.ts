@@ -30,8 +30,6 @@ export default (socket: APISocket, fileExtension: any) => {
 
 
     await global.SETTINGS.load();
-    // currently reusing the same search instance for all searches
-    global.SEARCH_INSTANCE = await global.SOCKET.post('search');
 
     const subscriberInfo = {
       id: 'auto_downloader',
@@ -48,7 +46,7 @@ export default (socket: APISocket, fileExtension: any) => {
 
 		// Set interval
 		searchInterval = setInterval(() => {
-      searchItem(fileExtension);
+      searchItem();
     }, global.SETTINGS.getValue('search_interval') * 60 * 1000, [fileExtension]);
 
     // Perform an instant search on start
