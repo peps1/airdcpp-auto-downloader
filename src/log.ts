@@ -20,7 +20,7 @@ export const printStatusMessage = async (statusMessage: string, type: string, en
 // https://airdcpp.docs.apiary.io/#reference/events
 export const printEvent = async (eventMessage: string, severity: string) => {
   global.SOCKET.post('events', {
-    text: `[${EXTENSION_NAME}] ${eventMessage}`,
+    text: `${eventMessage}`,
     severity,
   });
 };
