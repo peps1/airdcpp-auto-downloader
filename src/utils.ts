@@ -108,7 +108,7 @@ export const searchQueryDefinitions = [
     title: 'File extensions',
     default_value: '',
     type: 'string',
-    help: 'Separate extensions with ; (example: exe;iso;img)',
+    help: 'Separate extensions with ; ( example: exe;iso;img )',
     optional: true,
   }, {
     key: 'file_type',
@@ -121,6 +121,11 @@ export const searchQueryDefinitions = [
     title: 'Minimum size (MiB)',
     default_value: 0,
     type: 'number',
+  }, {
+    key: 'remove_after_found',
+    title: 'Remove after found',
+    default_value: false,
+    type: 'boolean',
   }
 ];
 

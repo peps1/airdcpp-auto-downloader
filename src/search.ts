@@ -77,7 +77,7 @@ export const searchItem = async () => {
         removeResultAddedListener,
         removeResultUpdatedListener
       ];
-      onSearchSent(item, instance, listeners, searchInfo, results);
+      onSearchSent(item, pos, instance, listeners, searchInfo, results);
     }, instance.id
   );
 
@@ -101,6 +101,12 @@ export const getNextPatternFromItem = (queryItem: any, pos: number): [number, st
     }
 
     if (!skipItem) {
+
+      // exit when string is empty
+      if (singlePattern.trim().length === 0) {
+        return;
+      }
+
       global.SEARCH_HISTORY.push({
         name: singlePattern,
         timestamp: new Date()
@@ -109,6 +115,27 @@ export const getNextPatternFromItem = (queryItem: any, pos: number): [number, st
     }
   }
   return;
+};
+
+const removeSearchAfterQueuing = async (search: string, pos: number) => {
+
+  // get all search items from settings
+  const settingsSearchItems = await global.SETTINGS.getValue('search_items');
+
+  // turn items into array
+  const items = settingsSearchItems[pos].pattern_list.split('\n');
+  // remove matching item
+  items.splice(items.indexOf(search));
+
+  // turn items back to string
+  const newPatternList = items.join('\n');
+
+  // replace pattern list with new one
+  settingsSearchItems[pos].pattern_list = newPatternList;
+
+  // update settings
+  await global.SETTINGS.setValue('search_items', settingsSearchItems);
+
 };
 
 // requeue all items that are older than the search interval
@@ -126,35 +153,59 @@ const requeueOldestSearches = async () => {
 
 };
 
-const onSearchSent = async (item: any, instance: any, listeners: any, searchInfo: any, results: any) => {
+const onSearchSent = async (item: any, pos: number, instance: any, listeners: any, searchInfo: any, results: any) => {
 
   // Show log message for the user
   printEvent(`The item "${searchInfo.query.pattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
 
   // Collect the results for some time
   let waited = 0;
-  while (results.length <= 1) {
+  let dlStarted = false;
+  while (results.length <= 5) {
     // sleep 2 seconds
     await utils.sleep(2000);
     waited = waited + 2;
 
-    // wait maximum 5 minutes
-    if (waited >= 300) {
+    // queue download after 30 seconds, triggers only once, but doesn't exit loop
+    if (waited <= 30 && results.length >= 1 && !dlStarted) {
+      printEvent(`The item "${searchInfo.query.pattern}" was found with ${results.length} results, adding to queue now.`, 'info');
+      startDownload(item, pos, instance, searchInfo, results);
+      dlStarted = true;
+    }
+    // queue download when 2 or more results are found
+    else if (waited > 30 && results.length >= 2) {
+      startDownload(item, pos, instance, searchInfo, results);
+      printEvent(`The item "${searchInfo.query.pattern}" was found with ${results.length} results, adding to queue now.`, 'info');
       break;
     }
-  }
-
-  const result = results[0];
-
-  if (result) {
-    global.SOCKET.post(`search/${instance.id}/results/${result.id}/download`, {
-      priority: item.priority,
-      target_directory: item.target_directory,
-    });
+    // wait maximum 5 minutes
+    else if (waited >= 300) {
+      break;
+    }
   }
 
   // remove all listeners
   for (const listener of listeners) {
     listener();
+  }
+};
+
+
+const startDownload = async ( item: any, pos: number, instance: any, searchInfo: any, results: any, ) => {
+  const result = results[0];
+
+  if (result) {
+    try {
+      global.SOCKET.post(`search/${instance.id}/results/${result.id}/download`, {
+        priority: item.priority,
+        target_directory: item.target_directory,
+      });
+      if (global.SETTINGS.getValue('search_items')[pos].remove_after_found) {
+        removeSearchAfterQueuing(searchInfo.query.pattern, pos);
+      }
+    } catch (error) {
+      printEvent(error, 'error');
+    }
+
   }
 };
