@@ -1,12 +1,13 @@
 # airdcpp-auto-downloader [![GitHub Actions][build-badge]][build] [![npm package][npm-badge]][npm] [![npm downloads][npm-dl-badge]][npm] [![codecov][coverage-badge]][coverage]
 
-# DISCLAIMER
-## This extension is still in its early development phase. Use at own risk. Extension settings will probably see several changes, so be prepared to lose the extension settings.
+Extension to add search terms that will be searched in intervals and downloaded when found.
 
-Extension to add search terms that will be searched in interavals and downloaded when found.
+## Features
 
-- [Bug tracker](https://github.com/peps1/airdcpp-auto-downloader/issues)
-- [Changelog](https://github.com/peps1/airdcpp-auto-downloader/blob/master/CHANGELOG.md)
+* Configure search interval in minutes
+* Provide multiple search terms as a list, one search term per line
+* Define minimum size, file type, file extensions and download directory
+* Remove search term when found (optional)
 
 ## Screenshot
 
@@ -14,6 +15,9 @@ Extension to add search terms that will be searched in interavals and downloaded
 
 
 ## Resources
+
+- [Bug tracker](https://github.com/peps1/airdcpp-auto-downloader/issues)
+- [Changelog](https://github.com/peps1/airdcpp-auto-downloader/blob/master/CHANGELOG.md)
 
 - [AirDC++ Web API reference](https://airdcpp.docs.apiary.io/)
 
