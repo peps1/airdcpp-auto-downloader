@@ -2,12 +2,12 @@
 export const requeueOldestSearches = async () => {
 
   const searchSchedule = global.SETTINGS.getValue('search_interval') * 60 * 1000;
-  const timeAgo = Date.now() - searchSchedule;
+  const requeueTime = Date.now() - ( searchSchedule * 2 );
 
   for (const item of global.SEARCH_HISTORY) {
-    if (item.timestamp < new Date(timeAgo)) {
+    if (item.timestamp < new Date(requeueTime)) {
       // older than X minutes
-      global.SEARCH_HISTORY.splice(global.SEARCH_HISTORY.indexOf(item));
+      global.SEARCH_HISTORY.splice(global.SEARCH_HISTORY.indexOf(item), 1);
     }
   }
 
@@ -50,8 +50,9 @@ export const removeSearchAfterQueuing = async (search: string, pos: number) => {
 
   // turn items into array
   const items = settingsSearchItems[pos].pattern_list.split('\n');
+
   // remove matching item
-  items.splice(items.indexOf(search));
+  items.splice(items.indexOf(search), 1);
 
   // turn items back to string
   const newPatternList = items.join('\n');
