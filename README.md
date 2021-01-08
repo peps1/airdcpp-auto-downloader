@@ -11,7 +11,7 @@ Extension to add search terms that will be searched in intervals and downloaded 
 
 ## Screenshot
 
-![TBA](doc/none.png?raw=true "None")
+![Settings Screenshot](doc/settings-screenshot.png?raw=true "None")
 
 
 ## Resources
