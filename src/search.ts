@@ -1,4 +1,6 @@
+import { startDownload } from './download';
 import { printEvent } from './log';
+import { getNextPatternFromItem, requeueOldestSearches } from './queue';
 import * as utils from './utils';
 
 const onSearchResultAdded = (results: any[], result: any) => {
@@ -88,71 +90,7 @@ export const searchItem = async () => {
 
 };
 
-export const getNextPatternFromItem = (queryItem: any, pos: number): [number, string]|undefined => {
-  // read item list
-  for (const [index, singlePattern] of queryItem.pattern_list.split('\n').entries()) {
-
-    let skipItem = false;
-    for (const item of global.SEARCH_HISTORY) {
-      if (item.name.includes(singlePattern)) {
-        // skip item if already in list
-        skipItem = true;
-      }
-    }
-
-    if (!skipItem) {
-
-      // exit when string is empty
-      if (singlePattern.trim().length === 0) {
-        return;
-      }
-
-      global.SEARCH_HISTORY.push({
-        name: singlePattern,
-        timestamp: new Date()
-      });
-      return [index, singlePattern];
-    }
-  }
-  return;
-};
-
-const removeSearchAfterQueuing = async (search: string, pos: number) => {
-
-  // get all search items from settings
-  const settingsSearchItems = await global.SETTINGS.getValue('search_items');
-
-  // turn items into array
-  const items = settingsSearchItems[pos].pattern_list.split('\n');
-  // remove matching item
-  items.splice(items.indexOf(search));
-
-  // turn items back to string
-  const newPatternList = items.join('\n');
-
-  // replace pattern list with new one
-  settingsSearchItems[pos].pattern_list = newPatternList;
-
-  // update settings
-  await global.SETTINGS.setValue('search_items', settingsSearchItems);
-
-};
-
-// requeue all items that are older than the search interval
-const requeueOldestSearches = async () => {
-
-  const searchSchedule = global.SETTINGS.getValue('search_interval') * 60 * 1000;
-  const timeAgo = Date.now() - searchSchedule;
-
-  for (const item of global.SEARCH_HISTORY) {
-    if (item.timestamp < new Date(timeAgo)) {
-      // older than X minutes
-      global.SEARCH_HISTORY.splice(global.SEARCH_HISTORY.indexOf(item));
-    }
-  }
-
-};
-
+// trigger when search is sent to hub
 const onSearchSent = async (item: any, pos: number, instance: any, listeners: any, searchInfo: any, results: any) => {
 
   // Show log message for the user
@@ -187,25 +125,5 @@ const onSearchSent = async (item: any, pos: number, instance: any, listeners: an
   // remove all listeners
   for (const listener of listeners) {
     listener();
-  }
-};
-
-
-const startDownload = async ( item: any, pos: number, instance: any, searchInfo: any, results: any, ) => {
-  const result = results[0];
-
-  if (result) {
-    try {
-      global.SOCKET.post(`search/${instance.id}/results/${result.id}/download`, {
-        priority: item.priority,
-        target_directory: item.target_directory,
-      });
-      if (global.SETTINGS.getValue('search_items')[pos].remove_after_found) {
-        removeSearchAfterQueuing(searchInfo.query.pattern, pos);
-      }
-    } catch (error) {
-      printEvent(error, 'error');
-    }
-
   }
 };
