@@ -1,9 +1,9 @@
 'use strict';
 
-import * as utils from './utils';
+import type { APISocket } from 'airdcpp-apisocket';
+import { SettingDefinitions } from './settings';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
 import { searchItem } from './search';
-import type { APISocket } from 'airdcpp-apisocket';
 
 const CONFIG_VERSION = 1;
 
@@ -22,7 +22,7 @@ export default (socket: APISocket, fileExtension: any) => {
     extensionName: fileExtension.name,
     configFile: fileExtension.configPath + 'config.json',
     configVersion: CONFIG_VERSION,
-    definitions: utils.SettingDefinitions,
+    definitions: SettingDefinitions,
   });
 
   let searchInterval: ReturnType<typeof setInterval>;
