@@ -15,7 +15,7 @@ export const startDownload = async ( item: any, pos: number, instance: any, sear
         removeSearchAfterQueuing(searchInfo.query.pattern, pos);
       }
     } catch (error) {
-      printEvent(error, 'error');
+      printEvent(`ERROR: ${error.code} - ${error.message}`, 'error');
     }
 
   }
