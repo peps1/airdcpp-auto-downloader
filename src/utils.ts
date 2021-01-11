@@ -2,8 +2,13 @@
 
 const byteUnits = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
+const priorityAutoId = 100;
+
 export const priorityEnum = [
 	{
+		id: priorityAutoId,
+		name: 'Auto',
+	}, {
 		id: -1,
 		name: 'Paused (forced)',
 	}, {
@@ -81,9 +86,12 @@ export const getLastDirectory = (fullPath: string) => {
   return result ? result[1] : fullPath;
 };
 
-
 export const sleep = (ms: number) => {
   return new Promise((resolve) => setTimeout(resolve, ms));
+};
+
+export const toApiPriority = (id: number) => {
+  return id === priorityAutoId ? null : id;
 };
 
 export const buildSearchQuery = (item: { pattern_list: any; extensions: string; file_type: any; min_size: number; }, itemIndex = 0) => {
