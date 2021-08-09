@@ -13,7 +13,7 @@ export const requeueOldestSearches = async () => {
 
 };
 
-export const getNextPatternFromItem = (queryItem: any, pos: number): [number, string]|undefined => {
+export const getNextPatternFromItem = (queryItem: any): [number, string]|undefined => {
   // read item list
   for (const [index, singlePattern] of queryItem.pattern_list.split('\n').entries()) {
 

@@ -15,6 +15,7 @@ export const sendChatMessage = (chatMessage: string, type: string, entityId: str
 
 // Basic chat command handling, returns possible status message to post
 // TODO: (legacy, remove at some point)
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const checkLegacyChatCommand = async (message: any, type: string) => {
   const text = message.text;
   if (text.length === 0 || text[0] !== '/') {
@@ -33,6 +34,7 @@ const checkLegacyChatCommand = async (message: any, type: string) => {
 
 // entityId is the session_id used to reference the current chat session
 // example https://airdcpp.docs.apiary.io/#reference/private-chat-sessions/methods/send-chat-message
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const checkChatCommand = async (type: string, data: any, entityId: string|number) => {
   // const { command, args } = data;
   const { command } = data;

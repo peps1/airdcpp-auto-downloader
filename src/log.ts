@@ -1,5 +1,3 @@
-declare const EXTENSION_NAME: string;
-
 // https://airdcpp.docs.apiary.io/#reference/private-chat-sessions/methods/send-status-message
 // https://airdcpp.docs.apiary.io/#reference/hub-sessions/messages/send-status-message
 export const printStatusMessage = async (statusMessage: string, type: string, entityId: string|number) => {
