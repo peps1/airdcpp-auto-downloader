@@ -1,6 +1,6 @@
 {
   "name": "airdcpp-auto-downloader",
-  "version": "1.0.0-beta.3",
+  "version": "1.0.0-beta.4",
   "description": "BETA TESTING: Extension to add search terms that will be searched in intervals and downloaded when found.",
   "homepage": "https://github.com/peps1/airdcpp-auto-downloader",
   "license": "MIT",
