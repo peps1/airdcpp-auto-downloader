@@ -47,7 +47,7 @@ export default (socket: APISocket, fileExtension: any) => {
 		// Set interval
 		searchInterval = setInterval(() => {
       searchItem();
-    }, global.SETTINGS.getValue('search_interval') * 60 * 1000, [fileExtension]);
+    }, global.SETTINGS.getValue('search_interval') * 60 * 1000);
 
     // Perform an instant search on start
     // TODO: enable instant search - needs some debugging
