@@ -14,6 +14,12 @@ const onSearchResultUpdated = (results: any[], result: any) => {
   results[toReplaceIndex] = result.result;
 };
 
+const getItemWithHighestRevelance = (results: any[]) => {
+  const max = Math.max(...results.map((o) => { return o.relevance; }));
+  const result: any = results.find((o) => { return o.relevance === max; });
+  return result;
+};
+
 export const searchItem = async () => {
   // Anything to search for?
   const itemCount = global.SETTINGS.getValue('search_items').length;
@@ -98,26 +104,27 @@ const onSearchSent = async (item: any, pos: number, instance: any, listeners: an
 
   // Collect the results for some time
   let waited = 0;
-  let dlStarted = false;
   while (results.length <= 5) {
     // sleep 2 seconds
     await utils.sleep(2000);
     waited = waited + 2;
 
     // queue download after 30 seconds, triggers only once, but doesn't exit loop
-    if (waited <= 30 && results.length >= 1 && !dlStarted) {
-      printEvent(`The item "${searchInfo.query.pattern}" was found with ${results.length} results, adding to queue now.`, 'info');
-      startDownload(item, pos, instance, searchInfo, results);
-      dlStarted = true;
-    }
-    // queue download when 2 or more results are found
-    else if (waited > 30 && results.length >= 2) {
-      startDownload(item, pos, instance, searchInfo, results);
-      printEvent(`The item "${searchInfo.query.pattern}" was found with ${results.length} results, adding to queue now.`, 'info');
+    if (waited <= 30 && results.length >= 2) {
+      const result = getItemWithHighestRevelance(results);
+      printEvent(`The item "${searchInfo.query.pattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
+      startDownload(item, pos, instance, searchInfo, result);
       break;
     }
-    // wait maximum 5 minutes
-    else if (waited >= 300) {
+    // queue download when 2 or more results are found
+    else if (waited > 30 && results.length >= 1) {
+      const result = getItemWithHighestRevelance(results);
+      printEvent(`The item "${searchInfo.query.pattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
+      startDownload(item, pos, instance, searchInfo, result);
+      break;
+    }
+    // wait maximum 60 seconds
+    else if (waited >= 60) {
       break;
     }
   }
