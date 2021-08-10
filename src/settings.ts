@@ -38,6 +38,11 @@ const searchQueryDefinitions = [
     title: 'Remove after found',
     default_value: false,
     type: 'boolean',
+  }, {
+    key: 'exact_match',
+    title: 'Require an exact match',
+    default_value: false,
+    type: 'boolean',
   }
 ];
 

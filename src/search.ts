@@ -99,8 +99,10 @@ export const searchItem = async () => {
 // trigger when search is sent to hub
 const onSearchSent = async (item: any, pos: number, instance: any, listeners: any, searchInfo: any, results: any) => {
 
+  const exactMatch: boolean = global.SETTINGS.getValue('search_items')[pos].exact_match;
+  const searchQueryPattern: string = searchInfo.query.pattern;
   // Show log message for the user
-  printEvent(`The item "${searchInfo.query.pattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
+  printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
 
   // Collect the results for some time
   let waited = 0;
@@ -112,15 +114,23 @@ const onSearchSent = async (item: any, pos: number, instance: any, listeners: an
     // queue download after 30 seconds, triggers only once, but doesn't exit loop
     if (waited <= 30 && results.length >= 2) {
       const result = getItemWithHighestRevelance(results);
-      printEvent(`The item "${searchInfo.query.pattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
-      startDownload(item, pos, instance, searchInfo, result);
+      if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
+        printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
+        startDownload(item, pos, instance, searchInfo, result);
+      } else {
+        printEvent(`The item "${searchQueryPattern}" was found but exact match is enabled and "${result.name}" does not match it`, 'info');
+      }
       break;
     }
     // queue download when 2 or more results are found
     else if (waited > 30 && results.length >= 1) {
       const result = getItemWithHighestRevelance(results);
-      printEvent(`The item "${searchInfo.query.pattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
-      startDownload(item, pos, instance, searchInfo, result);
+      if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
+        printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
+        startDownload(item, pos, instance, searchInfo, result);
+      } else {
+        printEvent(`The item "${searchQueryPattern}" was found but exact match is enabled and "${result.name}" does not match it`, 'info');
+      }
       break;
     }
     // wait maximum 60 seconds
