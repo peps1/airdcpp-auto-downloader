@@ -71,7 +71,7 @@ export const SettingDefinitions = [
       ...searchQueryDefinitions,
       {
         key: 'priority',
-        title: 'Priority',
+        title: 'Download priority',
         default_value: priorityAutoId,
         type: 'number',
         options: priorityEnum,
