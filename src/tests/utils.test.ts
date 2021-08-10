@@ -11,11 +11,13 @@ describe('buildSearchQuery', () => {
     expect(buildSearchQuery({
       pattern_list: 'Something1-Searching\nSomething-Else',
       extensions: '.mp3;.mov',
+      exclude: 'word1;word2',
       file_type: 'Folder',
       min_size: 123123513,
     })).to.deep.equal({
       pattern: 'Something1-Searching',
       extensions: ['.mp3','.mov'],
+      exclude: ['word1','word2'],
       file_type: 'Folder',
       min_size: 129104360767488,
     });

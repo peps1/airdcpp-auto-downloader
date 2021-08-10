@@ -94,10 +94,11 @@ export const toApiPriority = (id: number) => {
   return id === priorityAutoId ? null : id;
 };
 
-export const buildSearchQuery = (item: { pattern_list: any; extensions: string; file_type: any; min_size: number; }, itemIndex = 0) => {
+export const buildSearchQuery = (item: { pattern_list: any; extensions: string; exclude: string; file_type: any; min_size: number; }, itemIndex = 0) => {
   return {
     pattern: item.pattern_list.split('\n')[itemIndex],
     extensions: item.extensions.split(';'),
+		exclude: item.exclude.split(';'),
     file_type: item.file_type,
     min_size: item.min_size * 1024 * 1024, // MiB
   };
