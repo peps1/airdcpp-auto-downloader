@@ -43,6 +43,12 @@ const searchQueryDefinitions = [
     title: 'Require an exact match',
     default_value: false,
     type: 'boolean',
+  }, {
+    key: 'queue_all',
+    title: 'Queue all items matching the search',
+    default_value: false,
+    type: 'boolean',
+    help: 'When enabling this, the search should be as explicit as possible, it may queue hundreds of downloads if used wrong.'
   }
 ];
 

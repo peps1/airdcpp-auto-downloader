@@ -100,7 +100,11 @@ export const searchItem = async () => {
 const onSearchSent = async (item: any, pos: number, instance: any, listeners: any, searchInfo: any, results: any) => {
 
   const exactMatch: boolean = global.SETTINGS.getValue('search_items')[pos].exact_match;
+  const queueAll: boolean = global.SETTINGS.getValue('search_items')[pos].queue_all;
   const searchQueryPattern: string = searchInfo.query.pattern;
+
+  let queueResults: string[];
+
   // Show log message for the user
   printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
 
@@ -113,24 +117,44 @@ const onSearchSent = async (item: any, pos: number, instance: any, listeners: an
 
     // queue download after 30 seconds, triggers only once, but doesn't exit loop
     if (waited <= 30 && results.length >= 2) {
-      const result = getItemWithHighestRevelance(results);
-      if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
-        printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
-        startDownload(item, pos, instance, searchInfo, result);
+
+      if (!queueAll) {
+        queueResults= [getItemWithHighestRevelance(results)];
       } else {
-        printEvent(`The item "${searchQueryPattern}" was found but exact match is enabled and "${result.name}" does not match it`, 'info');
+        queueResults = results;
       }
+
+      queueResults.forEach((result: any) => {
+        if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
+          if (queueAll) {
+            printEvent(`Adding "${result.name}" to queue now.`, 'info');
+          } else {
+            printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
+          }
+          startDownload(item, pos, instance, searchInfo, result);
+        }
+      });
+
       break;
     }
     // queue download when 2 or more results are found
     else if (waited > 30 && results.length >= 1) {
-      const result = getItemWithHighestRevelance(results);
-      if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
-        printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
-        startDownload(item, pos, instance, searchInfo, result);
+      if (!queueAll) {
+        queueResults= [getItemWithHighestRevelance(results)];
       } else {
-        printEvent(`The item "${searchQueryPattern}" was found but exact match is enabled and "${result.name}" does not match it`, 'info');
+        queueResults = results;
       }
+
+      queueResults.forEach((result: any) => {
+        if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
+          if (queueAll) {
+            printEvent(`Adding "${result.name}" to queue now.`, 'info');
+          } else {
+            printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
+          }
+          startDownload(item, pos, instance, searchInfo, result);
+        }
+      });
       break;
     }
     // wait maximum 60 seconds
