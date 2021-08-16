@@ -35,7 +35,7 @@ const searchQueryDefinitions = [
     type: 'number',
   }, {
     key: 'remove_after_found',
-    title: 'Remove after found',
+    title: 'Remove from list after found and queued',
     default_value: false,
     type: 'boolean',
   }, {
