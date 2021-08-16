@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.0-beta6](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.6) (2021-08-15)
+[Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.4...v1.0.0-beta.6)
+
+### Added
+* Option to exclude keywords
+* Option to require exact match
+* Option to allow queueing all items from search result
+
 ## [v1.0.0-beta4](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.4) (2021-08-08)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.3...v1.0.0-beta.4)
 
