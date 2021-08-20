@@ -2,12 +2,23 @@
 
 Extension to add search terms that will be searched in intervals and downloaded when found.
 
+## Known issues
+Changing the search interval requires stopping and starting the extension
+
 ## Features
 
 * Configure search interval in minutes
 * Provide multiple search terms as a list, one search term per line
-* Define minimum size, file type, file extensions and download directory
-* Remove search term when found (optional)
+* Options for:
+  * minimum size
+  * file type
+  * file extensions
+  * download directory
+  * exclude keywords
+  * priority
+  * require exact match
+  * allow queueing all items from search result
+  * remove search term when found
 
 ## Screenshot
 

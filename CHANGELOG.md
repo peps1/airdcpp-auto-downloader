@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.0-beta7](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.7) (2021-08-15)
+[Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.6...v1.0.0-beta.7)
+
+### Fix
+* Priority IDs [#13](https://github.com/peps1/airdcpp-auto-downloader/issues/13)
+
 ## [v1.0.0-beta6](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.6) (2021-08-15)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.4...v1.0.0-beta.6)
 
