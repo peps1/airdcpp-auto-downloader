@@ -1,5 +1,7 @@
 'use strict';
 
+// import { DupeEnum } from './types/index';
+
 const byteUnits = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
 export const priorityAutoId = 100;
@@ -9,25 +11,25 @@ export const priorityEnum = [
 		id: priorityAutoId,
 		name: 'Auto',
 	}, {
-		id: -1,
+		id: 0,
 		name: 'Paused (forced)',
 	}, {
-		id: 0,
+		id: 1,
 		name: 'Paused',
 	}, {
-		id: 1,
+		id: 2,
 		name: 'Lowest',
 	}, {
-		id: 2,
+		id: 3,
 		name: 'Low',
 	}, {
-		id: 3,
+		id: 4,
 		name: 'Normal',
 	}, {
-		id: 4,
+		id: 5,
 		name: 'High',
 	}, {
-		id: 5,
+		id: 6,
 		name: 'Highest',
 	}
 ];
@@ -62,6 +64,22 @@ export const fileTypeEnum = [
 		name: 'Video',
 	}
 ];
+
+// export const dupeStringsEnum = [
+// 	{  id: 'share_partial', name: 'Share (partial)' },
+//   {  id: 'share_full', name: 'Share (full)' },
+//   {  id: 'queue_partial', name: 'Queue (partial)' },
+//   {  id: 'queue_full', name: 'Queue (full)' },
+//   {  id: 'finished_partial', name: 'Finished (partial)' },
+//   {  id: 'finished_full', name: 'Finished (full)' },
+//   {  id: 'share_queue', name: 'Share and queue' },
+// ]
+// 
+// const isShareDupe = (dupe: API.Dupe | null) => !!dupe && (
+//   dupe.id === DupeEnum.SHARE_FULL ||
+//   dupe.id === DupeEnum.SHARE_PARTIAL ||
+//   dupe.id === DupeEnum.SHARE_QUEUE
+// );
 
 // Format bytes to MiB, GiB, TiB
 export const formatSize = (fileSizeInBytes: number): string => {
@@ -103,3 +121,4 @@ export const buildSearchQuery = (item: { pattern_list: any; extensions: string; 
     min_size: item.min_size * 1024 * 1024, // MiB
   };
 };
+
