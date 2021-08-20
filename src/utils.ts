@@ -1,7 +1,5 @@
 'use strict';
 
-// import { DupeEnum } from './types/index';
-
 const byteUnits = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
 export const priorityAutoId = 100;
@@ -65,22 +63,6 @@ export const fileTypeEnum = [
 	}
 ];
 
-// export const dupeStringsEnum = [
-// 	{  id: 'share_partial', name: 'Share (partial)' },
-//   {  id: 'share_full', name: 'Share (full)' },
-//   {  id: 'queue_partial', name: 'Queue (partial)' },
-//   {  id: 'queue_full', name: 'Queue (full)' },
-//   {  id: 'finished_partial', name: 'Finished (partial)' },
-//   {  id: 'finished_full', name: 'Finished (full)' },
-//   {  id: 'share_queue', name: 'Share and queue' },
-// ]
-// 
-// const isShareDupe = (dupe: API.Dupe | null) => !!dupe && (
-//   dupe.id === DupeEnum.SHARE_FULL ||
-//   dupe.id === DupeEnum.SHARE_PARTIAL ||
-//   dupe.id === DupeEnum.SHARE_QUEUE
-// );
-
 // Format bytes to MiB, GiB, TiB
 export const formatSize = (fileSizeInBytes: number): string => {
   const thresh = 1024;
@@ -121,4 +103,3 @@ export const buildSearchQuery = (item: { pattern_list: any; extensions: string; 
     min_size: item.min_size * 1024 * 1024, // MiB
   };
 };
-
