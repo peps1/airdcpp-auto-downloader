@@ -13,7 +13,7 @@ const searchQueryDefinitions = [
     title: 'Exclude keywords',
     default_value: '',
     type: 'string',
-    help: 'Separate extensions with ; ( example: word1;word2;word3 )',
+    help: 'Separate keywords with ; ( example: word1;word2;word3 )',
     optional: true,
   }, {
     key: 'extensions',
