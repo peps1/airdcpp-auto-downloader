@@ -1,20 +1,21 @@
 import { startDownload } from './download';
 import { printEvent } from './log';
 import { getNextPatternFromItem, requeueOldestSearches } from './queue';
+import { GroupedSearchResult, SearchInstance } from './types/api/search';
 import * as utils from './utils';
 
-const onSearchResultAdded = (results: any[], result: any) => {
+const onSearchResultAdded = (results: GroupedSearchResult[], result: any) => {
   results.push(result.result);
 };
 
-const onSearchResultUpdated = (results: any[], result: any) => {
+const onSearchResultUpdated = (results: GroupedSearchResult[], result: any) => {
   const toReplaceIndex = results.findIndex((element: any) => {
     return element.id === result.result.id;
   });
   results[toReplaceIndex] = result.result;
 };
 
-const getItemWithHighestRevelance = (results: any[]) => {
+const getItemWithHighestRevelance = (results: GroupedSearchResult[]) => {
   const max = Math.max(...results.map((o) => { return o.relevance; }));
   const result: any = results.find((o) => { return o.relevance === max; });
   return result;
@@ -49,12 +50,12 @@ export const searchItem = async () => {
   }
 
   // Create search instance, expires after 10 minutes
-    const instance: any = await global.SOCKET.post('search', {
+    const instance: SearchInstance = await global.SOCKET.post('search', {
       expiration: 10
   });
 
   // Save the results
-  const results: any = [];
+  const results: GroupedSearchResult[] = [];
 
   // build search payload
   const query = utils.buildSearchQuery(item, pattern[0]);
@@ -63,7 +64,7 @@ export const searchItem = async () => {
   const removeResultAddedListener = await global.SOCKET.addListener(
     'search',
     'search_result_added',
-    (searchResult: any) => {
+    (searchResult: GroupedSearchResult) => {
       onSearchResultAdded(results, searchResult);
     }, instance.id
   );
@@ -71,7 +72,7 @@ export const searchItem = async () => {
   const removeResultUpdatedListener = await global.SOCKET.addListener(
     'search',
     'search_result_updated',
-    (searchResult: any) => {
+    (searchResult: GroupedSearchResult) => {
       onSearchResultUpdated(results, searchResult);
     }, instance.id
   );
@@ -97,13 +98,13 @@ export const searchItem = async () => {
 };
 
 // trigger when search is sent to hub
-const onSearchSent = async (item: any, pos: number, instance: any, listeners: any, searchInfo: any, results: any) => {
+const onSearchSent = async (item: string, pos: number, instance: SearchInstance, listeners: any, searchInfo: any, results: GroupedSearchResult[]) => {
 
   const exactMatch: boolean = global.SETTINGS.getValue('search_items')[pos].exact_match;
   const queueAll: boolean = global.SETTINGS.getValue('search_items')[pos].queue_all;
   const searchQueryPattern: string = searchInfo.query.pattern;
 
-  let queueResults: string[];
+  let queueResults: GroupedSearchResult[];
 
   // Show log message for the user
   printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
@@ -124,7 +125,7 @@ const onSearchSent = async (item: any, pos: number, instance: any, listeners: an
         queueResults = results;
       }
 
-      queueResults.forEach((result: any) => {
+      queueResults.forEach((result) => {
         if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
           if (queueAll) {
             printEvent(`Adding "${result.name}" to queue now.`, 'info');
@@ -140,12 +141,12 @@ const onSearchSent = async (item: any, pos: number, instance: any, listeners: an
     // queue download when 2 or more results are found
     else if (waited > 30 && results.length >= 1) {
       if (!queueAll) {
-        queueResults= [getItemWithHighestRevelance(results)];
+        queueResults = [getItemWithHighestRevelance(results)];
       } else {
         queueResults = results;
       }
 
-      queueResults.forEach((result: any) => {
+      queueResults.forEach((result) => {
         if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
           if (queueAll) {
             printEvent(`Adding "${result.name}" to queue now.`, 'info');
