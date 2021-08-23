@@ -15,6 +15,12 @@ const onSearchResultUpdated = (results: GroupedSearchResult[], result: any) => {
   results[toReplaceIndex] = result.result;
 };
 
+export const initializeSearchInterval = async (searchInterval: number) => {
+  global.SEARCH_INTERVAL = setInterval(() => {
+    searchItem();
+  }, searchInterval * 60 * 1000);
+};
+
 const getItemWithHighestRevelance = (results: GroupedSearchResult[]) => {
   const max = Math.max(...results.map((o) => { return o.relevance; }));
   const result: any = results.find((o) => { return o.relevance === max; });

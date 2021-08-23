@@ -1,9 +1,9 @@
 'use strict';
 
 import type { APISocket } from 'airdcpp-apisocket';
-import { SettingDefinitions } from './settings';
+import { onExtensionSettingsUpdated, SettingDefinitions } from './settings';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
-import { searchItem } from './search';
+import { initializeSearchInterval } from './search';
 
 const CONFIG_VERSION = 1;
 
@@ -25,7 +25,6 @@ export default (socket: APISocket, fileExtension: any) => {
     definitions: SettingDefinitions,
   });
 
-  let searchInterval: ReturnType<typeof setInterval>;
   fileExtension.onStart = async (sessionInfo: any) => {
 
 
@@ -39,15 +38,14 @@ export default (socket: APISocket, fileExtension: any) => {
     if (sessionInfo.system_info.api_feature_level >= 4) {
       socket.addListener('hubs', 'hub_text_command', onChatCommand.bind(null, 'hubs'));
       socket.addListener('private_chat', 'private_chat_text_command', onChatCommand.bind(null, 'private_chat'));
+      socket.addListener('extensions', 'extension_settings_updated', onExtensionSettingsUpdated);
     } else {
       socket.addHook('hubs', 'hub_outgoing_message_hook', onOutgoingHubMessage, subscriberInfo);
       socket.addHook('private_chat', 'private_chat_outgoing_message_hook', onOutgoingPrivateMessage, subscriberInfo);
     }
 
 		// Set interval
-		searchInterval = setInterval(() => {
-      searchItem();
-    }, global.SETTINGS.getValue('search_interval') * 60 * 1000);
+    initializeSearchInterval(global.SETTINGS.getValue('search_interval'));
 
     // Perform an instant search on start
     // TODO: enable instant search - needs some debugging
@@ -58,7 +56,7 @@ export default (socket: APISocket, fileExtension: any) => {
 
 	fileExtension.onStop = () => {
 		// We can't search without a socket
-		clearInterval(searchInterval);
+		clearInterval(global.SEARCH_INTERVAL);
 	};
 
 };

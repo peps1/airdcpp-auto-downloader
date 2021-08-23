@@ -1,4 +1,11 @@
-import { priorityAutoId, priorityEnum, fileTypeEnum } from './utils';
+import { initializeSearchInterval } from './search';
+
+export const onExtensionSettingsUpdated = async (data: any, entityId: any) => {
+  if (entityId.includes(EXTENSION_NAME) && 'search_interval' in data) {
+    clearInterval(global.SEARCH_INTERVAL);
+    initializeSearchInterval(data.search_interval);
+  }
+};
 
 const searchQueryDefinitions = [
   {
