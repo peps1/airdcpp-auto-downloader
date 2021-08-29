@@ -1,4 +1,5 @@
 import { initializeSearchInterval } from './search';
+import { dupeStringsEnum, priorityAutoId, priorityEnum, fileTypeEnum } from './utils';
 
 export const onExtensionSettingsUpdated = async (data: any, entityId: any) => {
   if (entityId.includes(EXTENSION_NAME) && 'search_interval' in data) {
@@ -56,6 +57,17 @@ const searchQueryDefinitions = [
     default_value: false,
     type: 'boolean',
     help: 'When enabling this, the search should be as explicit as possible, it may queue hundreds of downloads if used wrong.'
+  }, {
+    key: 'queue_dupe',
+    title: 'Queue items already in queue or share',
+    default_value: 'no_dupes',
+    type: 'string',
+    options: dupeStringsEnum
+  }, {
+    key: 'remove_dupe',
+    title: 'Remove Queue/Share dupe items from search',
+    default_value: false,
+    type: 'boolean',
   }
 ];
 

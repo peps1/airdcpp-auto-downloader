@@ -44,22 +44,22 @@ export const getNextPatternFromItem = (queryItem: any, pos: number): [number, st
 };
 
 // remove item from search_items
-export const removeSearchAfterQueuing = async (search: string, pos: number) => {
+export const removeSearchItemFromList = async (searchItem: string, listId: number) => {
 
   // get all search items from settings
   const settingsSearchItems = await global.SETTINGS.getValue('search_items');
 
   // turn items into array
-  const items = settingsSearchItems[pos].pattern_list.split('\n');
+  const items = settingsSearchItems[listId].pattern_list.split('\n');
 
   // remove matching item
-  items.splice(items.indexOf(search), 1);
+  items.splice(items.indexOf(searchItem), 1);
 
   // turn items back to string
   const newPatternList = items.join('\n');
 
   // replace pattern list with new one
-  settingsSearchItems[pos].pattern_list = newPatternList;
+  settingsSearchItems[listId].pattern_list = newPatternList;
 
   // update settings
   await global.SETTINGS.setValue('search_items', settingsSearchItems);

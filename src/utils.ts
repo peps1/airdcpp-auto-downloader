@@ -1,5 +1,8 @@
 'use strict';
 
+import * as API from './types/api';
+import { DupeEnum } from './types/api';
+
 const byteUnits = ['kB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
 
 export const priorityAutoId = 100;
@@ -62,6 +65,33 @@ export const fileTypeEnum = [
 		name: 'Video',
 	}
 ];
+
+export const dupeStringsEnum = [
+	{  id: 'share', name: 'In Share Only' },
+  {  id: 'queue', name: 'In Queue Only' },
+  {  id: 'share_queue', name: 'In Share or Queue' },
+	{  id: 'no_dupes', name: 'No Dupes' },
+];
+
+export const isDupe = (dupe: API.Dupe | null) => !!dupe && (
+  dupe.id === DupeEnum.SHARE_FULL        ||
+  dupe.id === DupeEnum.SHARE_PARTIAL     ||
+	dupe.id === DupeEnum.QUEUE_FULL        ||
+  dupe.id === DupeEnum.QUEUE_PARTIAL     ||
+	dupe.id === DupeEnum.SHARE_QUEUE       ||
+	dupe.id === DupeEnum.FINISHED_FULL     ||
+	dupe.id === DupeEnum.FINISHED_PARTIAL
+);
+
+export const isShareDupe = (dupe: API.Dupe | null) => !!dupe && (
+  dupe.id === DupeEnum.SHARE_FULL ||
+  dupe.id === DupeEnum.SHARE_PARTIAL
+);
+
+export const isQueueDupe = (dupe: API.Dupe | null) => !!dupe && (
+  dupe.id === DupeEnum.QUEUE_FULL ||
+  dupe.id === DupeEnum.QUEUE_PARTIAL
+);
 
 // Format bytes to MiB, GiB, TiB
 export const formatSize = (fileSizeInBytes: number): string => {

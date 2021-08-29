@@ -1,5 +1,5 @@
 import { printEvent } from './log';
-import { removeSearchAfterQueuing } from './queue';
+import { removeSearchItemFromList } from './queue';
 import { toApiPriority } from './utils';
 
 export const startDownload = async ( item: any, pos: number, instance: any, searchInfo: any, result: any, ) => {
@@ -9,9 +9,9 @@ export const startDownload = async ( item: any, pos: number, instance: any, sear
       target_directory: item.target_directory,
     });
     if (global.SETTINGS.getValue('search_items')[pos].remove_after_found) {
-      removeSearchAfterQueuing(searchInfo.query.pattern, pos);
+      removeSearchItemFromList(searchInfo.query.pattern, pos);
     }
-  } catch (error) {
+  } catch (error: any) {
     printEvent(`ERROR: ${error.code} - ${error.message}`, 'error');
   }
 };

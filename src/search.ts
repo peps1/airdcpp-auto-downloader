@@ -1,6 +1,6 @@
 import { startDownload } from './download';
 import { printEvent } from './log';
-import { getNextPatternFromItem, requeueOldestSearches } from './queue';
+import { getNextPatternFromItem, removeSearchItemFromList, requeueOldestSearches } from './queue';
 import { GroupedSearchResult, SearchInstance } from './types/api/search';
 import * as utils from './utils';
 
@@ -104,10 +104,12 @@ export const searchItem = async () => {
 };
 
 // trigger when search is sent to hub
-const onSearchSent = async (item: string, pos: number, instance: SearchInstance, listeners: any, searchInfo: any, results: GroupedSearchResult[]) => {
+const onSearchSent = async (item: string, listId: number, instance: SearchInstance, listeners: any, searchInfo: any, results: GroupedSearchResult[]) => {
 
-  const exactMatch: boolean = global.SETTINGS.getValue('search_items')[pos].exact_match;
-  const queueAll: boolean = global.SETTINGS.getValue('search_items')[pos].queue_all;
+  const exactMatch: boolean = global.SETTINGS.getValue('search_items')[listId].exact_match;
+  const queueAll: boolean = global.SETTINGS.getValue('search_items')[listId].queue_all;
+  const queueDupe: string = global.SETTINGS.getValue('search_items')[listId].queue_dupe;
+  const removeDupe: boolean = global.SETTINGS.getValue('search_items')[listId].remove_dupe;
   const searchQueryPattern: string = searchInfo.query.pattern;
 
   let queueResults: GroupedSearchResult[];
@@ -122,46 +124,55 @@ const onSearchSent = async (item: string, pos: number, instance: SearchInstance,
     await utils.sleep(2000);
     waited = waited + 2;
 
-    // queue download after 30 seconds, triggers only once, but doesn't exit loop
-    if (waited <= 30 && results.length >= 2) {
+    // queue download when 2 or more results are found
+    // queue download after 30s
+    if ( (waited <= 30 && results.length >= 2) || (waited > 30 && results.length >= 1)) {
 
+      // get only the most relevant item if queueAll is disabled
       if (!queueAll) {
         queueResults= [getItemWithHighestRevelance(results)];
       } else {
         queueResults = results;
       }
 
-      queueResults.forEach((result) => {
-        if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
-          if (queueAll) {
-            printEvent(`Adding "${result.name}" to queue now.`, 'info');
-          } else {
-            printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
-          }
-          startDownload(item, pos, instance, searchInfo, result);
-        }
-      });
-
-      break;
-    }
-    // queue download when 2 or more results are found
-    else if (waited > 30 && results.length >= 1) {
-      if (!queueAll) {
-        queueResults = [getItemWithHighestRevelance(results)];
-      } else {
-        queueResults = results;
+      // remove dupe from list
+      // If there is multiple results we plan to download,
+      // we only remove the search term if all of these are dupes.
+      // Dupes within the search term will still be skipped below
+      if ( removeDupe && queueResults.every((result) => {
+        utils.isDupe(result.dupe);
+      }) ) {
+        removeSearchItemFromList(searchQueryPattern, listId);
       }
 
       queueResults.forEach((result) => {
-        if ( (exactMatch && searchQueryPattern === result.name) || !exactMatch ) {
-          if (queueAll) {
-            printEvent(`Adding "${result.name}" to queue now.`, 'info');
-          } else {
-            printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
-          }
-          startDownload(item, pos, instance, searchInfo, result);
+
+        // check exact match
+        if ( exactMatch && searchQueryPattern !== result.name ) { return; }
+
+        // check for dupe
+        switch (queueDupe) {
+          case 'no_dupes':
+            if ( utils.isDupe(result.dupe) ) { return; }
+            break;
+          case 'share':
+            if ( utils.isQueueDupe(result.dupe) ) { return; }
+            break;
+          case 'queue':
+            if ( utils.isShareDupe(result.dupe) ) { return; }
+            break;
+          case 'share_queue':
+            break;
         }
+
+        if (queueAll) {
+          printEvent(`Adding "${result.name}" to queue now.`, 'info');
+        } else {
+          printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
+        }
+        startDownload(item, listId, instance, searchInfo, result);
       });
+
       break;
     }
     // wait maximum 60 seconds
