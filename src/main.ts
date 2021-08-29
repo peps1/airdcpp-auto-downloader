@@ -1,6 +1,6 @@
 'use strict';
 
-import type { APISocket } from 'airdcpp-apisocket';
+import { APISocket, SubscriptionRemoveHandler } from 'airdcpp-apisocket';
 import { onExtensionSettingsUpdated, SettingDefinitions } from './settings';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
 import { initializeSearchInterval } from './search';
@@ -16,6 +16,11 @@ export default (socket: APISocket, fileExtension: any) => {
   global.SOCKET = socket;
   // TODO: save search history in settings
   global.SEARCH_HISTORY = [];
+  let removeHubTextCommandListener: SubscriptionRemoveHandler;
+  let removePrivateChatTextCommandListener: SubscriptionRemoveHandler;
+  let removeExtensionSettingsUpdatedListener: SubscriptionRemoveHandler;
+  let removeHubOutgoingMessageHook: SubscriptionRemoveHandler;
+  let removePrivateChatOutgoingMessageHook: SubscriptionRemoveHandler;
 
   // INITIALIZATION
   global.SETTINGS = SettingsManager(socket, {
@@ -36,12 +41,12 @@ export default (socket: APISocket, fileExtension: any) => {
     };
 
     if (sessionInfo.system_info.api_feature_level >= 4) {
-      socket.addListener('hubs', 'hub_text_command', onChatCommand.bind(null, 'hubs'));
-      socket.addListener('private_chat', 'private_chat_text_command', onChatCommand.bind(null, 'private_chat'));
-      socket.addListener('extensions', 'extension_settings_updated', onExtensionSettingsUpdated);
+      removeHubTextCommandListener = await socket.addListener('hubs', 'hub_text_command', onChatCommand.bind(null, 'hubs'));
+      removePrivateChatTextCommandListener = await socket.addListener('private_chat', 'private_chat_text_command', onChatCommand.bind(null, 'private_chat'));
+      removeExtensionSettingsUpdatedListener = await socket.addListener('extensions', 'extension_settings_updated', onExtensionSettingsUpdated);
     } else {
-      socket.addHook('hubs', 'hub_outgoing_message_hook', onOutgoingHubMessage, subscriberInfo);
-      socket.addHook('private_chat', 'private_chat_outgoing_message_hook', onOutgoingPrivateMessage, subscriberInfo);
+      removeHubOutgoingMessageHook = await socket.addHook('hubs', 'hub_outgoing_message_hook', onOutgoingHubMessage, subscriberInfo);
+      removePrivateChatOutgoingMessageHook = await socket.addHook('private_chat', 'private_chat_outgoing_message_hook', onOutgoingPrivateMessage, subscriberInfo);
     }
 
 		// Set interval
@@ -54,9 +59,17 @@ export default (socket: APISocket, fileExtension: any) => {
 
   };
 
-	fileExtension.onStop = () => {
+	fileExtension.onStop = async (sessionInfo: any) => {
 		// We can't search without a socket
 		clearInterval(global.SEARCH_INTERVAL);
+    if (sessionInfo.system_info.api_feature_level >= 4) {
+      removeHubTextCommandListener();
+      removePrivateChatTextCommandListener();
+      removeExtensionSettingsUpdatedListener();
+    } else {
+      removeHubOutgoingMessageHook();
+      removePrivateChatOutgoingMessageHook();
+    }
 	};
 
 };
