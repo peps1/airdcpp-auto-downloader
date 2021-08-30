@@ -21,7 +21,7 @@ export const initializeSearchInterval = async (searchInterval: number) => {
   }, searchInterval * 60 * 1000);
 };
 
-const getItemWithHighestRevelance = (results: GroupedSearchResult[]) => {
+const getItemWithHighestRelevance = (results: GroupedSearchResult[]) => {
   const max = Math.max(...results.map((o) => { return o.relevance; }));
   const result: any = results.find((o) => { return o.relevance === max; });
   return result;
@@ -130,7 +130,7 @@ const onSearchSent = async (item: string, listId: number, instance: SearchInstan
 
       // get only the most relevant item if queueAll is disabled
       if (!queueAll) {
-        queueResults= [getItemWithHighestRevelance(results)];
+        queueResults= [getItemWithHighestRelevance(results)];
       } else {
         queueResults = results;
       }
