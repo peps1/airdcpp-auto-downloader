@@ -1,17 +1,17 @@
 'use strict';
 
 import { APISocket, SubscriptionRemoveHandler } from 'airdcpp-apisocket';
-import { onExtensionSettingsUpdated, SettingDefinitions } from './settings';
+import { onExtensionSettingsUpdated, SettingDefinitions, migrate } from './settings';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
 import { initializeSearchInterval } from './search';
 
-const CONFIG_VERSION = 1;
-
-
 // Settings manager docs: https://github.com/airdcpp-web/airdcpp-extension-settings-js
 import SettingsManager from 'airdcpp-extension-settings';
+import { SessionInfo } from './types/api';
 
-export default (socket: APISocket, fileExtension: any) => {
+const CONFIG_VERSION = 2;
+
+export default (socket: APISocket, extension: any) => {
 
   global.SOCKET = socket;
   // TODO: save search history in settings
@@ -22,21 +22,20 @@ export default (socket: APISocket, fileExtension: any) => {
   let removeHubOutgoingMessageHook: SubscriptionRemoveHandler;
   let removePrivateChatOutgoingMessageHook: SubscriptionRemoveHandler;
 
-  // INITIALIZATION
-  global.SETTINGS = SettingsManager(socket, {
-    extensionName: fileExtension.name,
-    configFile: fileExtension.configPath + 'config.json',
-    configVersion: CONFIG_VERSION,
-    definitions: SettingDefinitions,
-  });
+  extension.onStart = async (sessionInfo: SessionInfo) => {
 
-  fileExtension.onStart = async (sessionInfo: any) => {
+    // INITIALIZATION
+    global.SETTINGS = SettingsManager(socket, {
+      extensionName: extension.name,
+      configFile: extension.configPath + 'config.json',
+      configVersion: CONFIG_VERSION,
+      definitions: SettingDefinitions,
+    });
 
-
-    await global.SETTINGS.load();
+    await global.SETTINGS.load(migrate);
 
     const subscriberInfo = {
-      id: 'auto_downloader',
+      id: extension.name,
       name: 'Auto downloader',
     };
 
@@ -59,7 +58,7 @@ export default (socket: APISocket, fileExtension: any) => {
 
   };
 
-	fileExtension.onStop = async (sessionInfo: any) => {
+	extension.onStop = async (sessionInfo: SessionInfo) => {
 		// We can't search without a socket
 		clearInterval(global.SEARCH_INTERVAL);
     if (sessionInfo.system_info.api_feature_level >= 4) {

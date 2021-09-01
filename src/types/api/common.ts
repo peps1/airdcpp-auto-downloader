@@ -227,3 +227,22 @@ export interface DownloadableItemState {
   str: string;
   time_finished: number;
 }
+
+export enum PlatformEnum {
+  WINDOWS = 'win32',
+  MAC = 'darwin',
+  LINUX = 'linux',
+  FREEBSD = 'freebsd',
+  OTHER = 'other',
+}
+
+export interface SessionInfo {
+  system_info: {
+    // path_separator: string;
+    cid: string;
+    api_feature_level: number;
+    platform: PlatformEnum;
+  };
+  auth_token: string;
+  token_type: string;
+}

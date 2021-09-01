@@ -8,6 +8,38 @@ export const onExtensionSettingsUpdated = async (data: any, entityId: any) => {
   }
 };
 
+// Settings migration callback
+export const migrate = (loadedConfigVersion: number, loadedData: typeof SettingDefinitions) => {
+
+  if (loadedConfigVersion <= 1) {
+    // Perform the required conversions
+    return Object.keys(loadedData).reduce((reduced, key) => {
+
+      if ( key === 'search_items' ) {
+        reduced[key] = [];
+        // The key 'exclude' inside 'search_items' has been renamed to 'excluded'
+        loadedData[key].forEach( (item: any, index: number) => {
+          if ('exclude' in item) {
+            item.excluded = item.exclude;
+            delete item.exclude;
+            reduced[key][index] = item;
+          } else {
+            reduced[key][index] = item;
+          }
+        });
+
+      } else {
+        reduced[key] = loadedData[key];
+      }
+
+      return reduced;
+    }, {});
+  }
+
+  // Return as it is
+  return loadedData;
+};
+
 const searchQueryDefinitions = [
   {
     key: 'pattern_list',
@@ -17,8 +49,8 @@ const searchQueryDefinitions = [
     help: 'One search item/pattern per line',
     optional: true,
   }, {
-    key: 'exclude',
-    title: 'Exclude keywords',
+    key: 'excluded',
+    title: 'Excluded keywords',
     default_value: '',
     type: 'string',
     help: 'Separate keywords with ; ( example: word1;word2;word3 )',
