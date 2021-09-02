@@ -110,6 +110,7 @@ const onSearchSent = async (item: string, listId: number, instance: SearchInstan
   const queueAll: boolean = global.SETTINGS.getValue('search_items')[listId].queue_all;
   const queueDupe: string = global.SETTINGS.getValue('search_items')[listId].queue_dupe;
   const removeDupe: boolean = global.SETTINGS.getValue('search_items')[listId].remove_dupe;
+  const excludedUsers = utils.getExcludedUsers(global.SETTINGS.getValue('search_items')[listId].excluded_users);
   const searchQueryPattern: string = searchInfo.query.pattern;
 
   let queueResults: GroupedSearchResult[];
@@ -145,10 +146,19 @@ const onSearchSent = async (item: string, listId: number, instance: SearchInstan
         removeSearchItemFromList(searchQueryPattern, listId);
       }
 
+      // inside use return to skip search result
       queueResults.forEach((result) => {
 
         // check exact match
         if ( exactMatch && searchQueryPattern !== result.name ) { return; }
+
+        // check exclude users
+        const nicks = utils.turnNicksIntoArray(result.users.user.nicks);
+        if (result.users.count === 1 && excludedUsers.some( (excludeUser) => {
+          return nicks.some( (nick) => {
+            return nick.includes(excludeUser);
+          });
+        })) { return; }
 
         // check for dupe
         switch (queueDupe) {

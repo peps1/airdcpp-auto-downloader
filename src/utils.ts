@@ -124,6 +124,23 @@ export const toApiPriority = (id: number) => {
   return id === priorityAutoId ? null : id;
 };
 
+export const getExcludedUsers = (excludedUsers: string): string[] => {
+	return excludedUsers.split(';');
+};
+
+export const turnNicksIntoArray = (nicks: string): string[] => {
+	const regex = /[,]|^(\(|\))/g;
+
+	// turn usernames string into array
+	let nicksArray = nicks.split(' ');
+
+	// 1. replace unneeded characters
+	// 2. trim whitespaces
+	// 3. filter empty strings
+	nicksArray = nicksArray.map(x => x.replace(regex, '').trim()).filter(item => { return item !== ''; });
+	return nicksArray;
+};
+
 export const buildSearchQuery = (item: { pattern_list: any; extensions: string; excluded: string; file_type: any; min_size: number; }, itemIndex = 0) => {
   return {
     pattern: item.pattern_list.split('\n')[itemIndex],

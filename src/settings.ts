@@ -56,6 +56,13 @@ const searchQueryDefinitions = [
     help: 'Separate keywords with ; ( example: word1;word2;word3 )',
     optional: true,
   }, {
+    key: 'excluded_users',
+    title: 'Excluded users',
+    default_value: '',
+    type: 'string',
+    help: 'Separate users with ; ( example: user1;user2;user3 )',
+    optional: true,
+  }, {
     key: 'extensions',
     title: 'File extensions',
     default_value: '',

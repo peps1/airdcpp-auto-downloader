@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 // import sinon from 'sinon';
 import assert from 'assert';
 
-import { formatSize, getLastDirectory, sleep , buildSearchQuery } from '../utils';
+import { formatSize, getLastDirectory, sleep , buildSearchQuery, turnNicksIntoArray } from '../utils';
 
 
 describe('buildSearchQuery', () => {
@@ -24,6 +24,14 @@ describe('buildSearchQuery', () => {
   });
 });
 
+describe('turnNicksIntoArray', () => {
+  it('Should turn string of nicks into clean array', () => {
+    expect(turnNicksIntoArray('#[prefix]-user/name (--[prefix-user/name]--, [prefix]username, [prefix]username, [prefix]username, username )')
+    ).to.deep.equal(
+      [ '#[prefix]-user/name', '--[prefix-user/name]--', '[prefix]username', '[prefix]username', '[prefix]username', 'username' ]
+    );
+  });
+});
 
 describe('formatSize', () => {
   it('Should format bytes to MiB, GiB, TiB', () => {
