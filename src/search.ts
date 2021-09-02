@@ -37,19 +37,19 @@ export const searchItem = async () => {
   // Get a random item to search for
   // TODO: pick random item, check item against recently searched list, if on list pick another, add item to list of recently searched (save in settings.json)
   // TODO: iterate through whole item list per search_interval
-  const pos = Math.floor(Math.random() * itemCount);
+  const listId = Math.floor(Math.random() * itemCount);
 
-  const item = global.SETTINGS.getValue('search_items')[pos];
+  const item = global.SETTINGS.getValue('search_items')[listId];
 
   // The item might actually be a list of items
 
   // Get next item to search
-  let pattern = getNextPatternFromItem(item, pos);
+  let pattern = getNextPatternFromItem(item, listId);
 
   if (!pattern) {
     requeueOldestSearches();
     // Get next item to search
-    pattern = getNextPatternFromItem(item, pos);
+    pattern = getNextPatternFromItem(item, listId);
     if (!pattern) {
       return;
     }
@@ -92,7 +92,7 @@ export const searchItem = async () => {
         removeResultAddedListener,
         removeResultUpdatedListener
       ];
-      onSearchSent(item, pos, instance, listeners, searchInfo, results);
+      onSearchSent(item, listId, instance, listeners, searchInfo, results);
     }, instance.id
   );
 
