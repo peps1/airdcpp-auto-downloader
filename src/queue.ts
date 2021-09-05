@@ -22,7 +22,6 @@ export const getNextPatternFromItem = (queryItem: any, listId: number): [number,
 
     let skipItem = false;
 
-    global.DB.read();
     // eslint-disable-next-line no-console
     console.log(global.DB.data);
 

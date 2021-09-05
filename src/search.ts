@@ -28,6 +28,7 @@ const getItemWithHighestRelevance = (results: GroupedSearchResult[]) => {
 };
 
 export const searchItem = async () => {
+
   // Anything to search for?
   const itemCount = global.SETTINGS.getValue('search_items').length;
   if (itemCount === 0) {
@@ -39,32 +40,32 @@ export const searchItem = async () => {
   // TODO: iterate through whole item list per search_interval
   const listId = Math.floor(Math.random() * itemCount);
 
-  const item = global.SETTINGS.getValue('search_items')[listId];
+  const itemList = global.SETTINGS.getValue('search_items')[listId];
 
   // The item might actually be a list of items
 
   // Get next item to search
-  let pattern = getNextPatternFromItem(item, listId);
+  let pattern = getNextPatternFromItem(itemList, listId);
 
   if (!pattern) {
     requeueOldestSearches();
     // Get next item to search
-    pattern = getNextPatternFromItem(item, listId);
+    pattern = getNextPatternFromItem(itemList, listId);
     if (!pattern) {
       return;
     }
   }
 
   // Create search instance, expires after 10 minutes
-    const instance: SearchInstance = await global.SOCKET.post('search', {
-      expiration: 10
+  const instance: SearchInstance = await global.SOCKET.post('search', {
+    expiration: 10
   });
 
   // Save the results
   const results: GroupedSearchResult[] = [];
 
   // build search payload
-  const query = utils.buildSearchQuery(item, pattern[0]);
+  const query = utils.buildSearchQuery(itemList, pattern[0]);
 
   // add result listener
   const removeResultAddedListener = await global.SOCKET.addListener(
@@ -92,7 +93,7 @@ export const searchItem = async () => {
         removeResultAddedListener,
         removeResultUpdatedListener
       ];
-      onSearchSent(item, listId, instance, listeners, searchInfo, results);
+      onSearchSent(itemList, listId, instance, listeners, searchInfo, results);
     }, instance.id
   );
 

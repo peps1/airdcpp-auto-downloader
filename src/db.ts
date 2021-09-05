@@ -14,9 +14,6 @@ export const lowDb = (extension: any) => {
   db.read();
   db.data = db.data || { search_history:  [] };
 
-  db.write();
-  // eslint-disable-next-line no-console
-  console.log(db.data);
   return db;
 
 };

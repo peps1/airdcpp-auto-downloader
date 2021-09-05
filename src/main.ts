@@ -3,8 +3,8 @@
 
 import { lowDb } from 'db';
 
-import { APISocket, SubscriptionRemoveHandler } from 'airdcpp-apisocket';
-import { onExtensionSettingsUpdated, SettingDefinitions, migrate } from './settings';
+import { APISocket } from 'airdcpp-apisocket';
+import { SettingDefinitions, migrate } from './settings';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
 import { initializeSearchInterval } from './search';
 
@@ -18,24 +18,9 @@ const CONFIG_VERSION = 2;
 export default (socket: APISocket, extension: any) => {
 
 
-  // eslint-disable-next-line no-console
-  console.log(extension);
   global.DB = lowDb(extension);
-
-
-  // eslint-disable-next-line no-console
-  console.log(global.DB.data);
-
-
   global.SOCKET = socket;
   global.EXTENSION = extension;
-  // TODO: save search history in settings
-
-  let removeHubTextCommandListener: SubscriptionRemoveHandler;
-  let removePrivateChatTextCommandListener: SubscriptionRemoveHandler;
-  let removeExtensionSettingsUpdatedListener: SubscriptionRemoveHandler;
-  let removeHubOutgoingMessageHook: SubscriptionRemoveHandler;
-  let removePrivateChatOutgoingMessageHook: SubscriptionRemoveHandler;
 
   extension.onStart = async (sessionInfo: SessionInfo) => {
 
@@ -55,16 +40,23 @@ export default (socket: APISocket, extension: any) => {
     };
 
     if (sessionInfo.system_info.api_feature_level >= 4) {
-      removeHubTextCommandListener = await socket.addListener('hubs', 'hub_text_command', onChatCommand.bind(null, 'hubs'));
-      removePrivateChatTextCommandListener = await socket.addListener('private_chat', 'private_chat_text_command', onChatCommand.bind(null, 'private_chat'));
-      removeExtensionSettingsUpdatedListener = await socket.addListener('extensions', 'extension_settings_updated', onExtensionSettingsUpdated);
+      socket.addListener('hubs', 'hub_text_command', onChatCommand.bind(null, 'hubs'));
+      socket.addListener('private_chat', 'private_chat_text_command', onChatCommand.bind(null, 'private_chat'));
     } else {
-      removeHubOutgoingMessageHook = await socket.addHook('hubs', 'hub_outgoing_message_hook', onOutgoingHubMessage, subscriberInfo);
-      removePrivateChatOutgoingMessageHook = await socket.addHook('private_chat', 'private_chat_outgoing_message_hook', onOutgoingPrivateMessage, subscriberInfo);
+      socket.addHook('hubs', 'hub_outgoing_message_hook', onOutgoingHubMessage, subscriberInfo);
+      socket.addHook('private_chat', 'private_chat_outgoing_message_hook', onOutgoingPrivateMessage, subscriberInfo);
     }
 
 		// Set interval
     initializeSearchInterval(global.SETTINGS.getValue('search_interval'));
+
+    global.SETTINGS.onValuesUpdated = async (updatedValues: any) => {
+      // Reset search interval
+      if (Object.prototype.hasOwnProperty.call(updatedValues, 'search_interval')) {
+        clearInterval(global.SEARCH_INTERVAL);
+        initializeSearchInterval(updatedValues.search_interval);
+      }
+    };
 
     // Perform an instant search on start
     // TODO: enable instant search - needs some debugging
@@ -73,17 +65,9 @@ export default (socket: APISocket, extension: any) => {
 
   };
 
-	extension.onStop = async (sessionInfo: SessionInfo) => {
+	extension.onStop = async () => {
 		// We can't search without a socket
 		clearInterval(global.SEARCH_INTERVAL);
-    // if (sessionInfo.system_info.api_feature_level >= 4) {
-    //   removeHubTextCommandListener();
-    //   removePrivateChatTextCommandListener();
-    //   removeExtensionSettingsUpdatedListener();
-    // } else {
-    //   removeHubOutgoingMessageHook();
-    //   removePrivateChatOutgoingMessageHook();
-    // }
 	};
 
 };
