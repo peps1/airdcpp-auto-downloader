@@ -1,5 +1,25 @@
 # Changelog
 
+## [v1.0.0-beta8](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.8) (2021-08-24)
+[Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.7...v1.0.0-beta.8)
+
+### Fixed
+// TODO * When using multiple lists it would keep repeat searching items from first list more often than others.
+* Exclude keywords: used wrong option, also updated config parameter and migrating old config. (Thanks for reporting!) [#13](https://github.com/peps1/airdcpp-auto-downloader/issues/13)
+
+### Added
+* Saving already searched items through restarts
+* Search interval will now be set immediatly after config change, extension restart was required before.
+* Option to exclude users (please check README for some notes) [#7](https://github.com/peps1/airdcpp-auto-downloader/issues/7)
+* Option to prevent or allow downloading dupes (Share dupes or Queue dupes) [#7](https://github.com/peps1/airdcpp-auto-downloader/issues/7)
+* Option to remove Queue/Share dupe items from search [#7](https://github.com/peps1/airdcpp-auto-downloader/issues/7)
+
+### Internals
+* some cleanup
+* adding some typings
+* don't pack .ts files
+* Update dependencies
+
 ## [v1.0.0-beta7](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.7) (2021-08-15)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.6...v1.0.0-beta.7)
 
