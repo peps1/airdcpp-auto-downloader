@@ -1,5 +1,8 @@
 'use strict';
 
+
+import lowDb from 'db';
+
 import { APISocket, SubscriptionRemoveHandler } from 'airdcpp-apisocket';
 import { onExtensionSettingsUpdated, SettingDefinitions, migrate } from './settings';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
@@ -9,13 +12,25 @@ import { initializeSearchInterval } from './search';
 import SettingsManager from 'airdcpp-extension-settings';
 import { SessionInfo } from './types/api';
 
+
 const CONFIG_VERSION = 2;
 
 export default (socket: APISocket, extension: any) => {
 
+
+  // eslint-disable-next-line no-console
+  console.log(extension);
+  global.DB = lowDb(extension);
+
+
+  // eslint-disable-next-line no-console
+  console.log(global.DB.data);
+
+
   global.SOCKET = socket;
+  global.EXTENSION = extension;
   // TODO: save search history in settings
-  global.SEARCH_HISTORY = [];
+
   let removeHubTextCommandListener: SubscriptionRemoveHandler;
   let removePrivateChatTextCommandListener: SubscriptionRemoveHandler;
   let removeExtensionSettingsUpdatedListener: SubscriptionRemoveHandler;
@@ -61,14 +76,14 @@ export default (socket: APISocket, extension: any) => {
 	extension.onStop = async (sessionInfo: SessionInfo) => {
 		// We can't search without a socket
 		clearInterval(global.SEARCH_INTERVAL);
-    if (sessionInfo.system_info.api_feature_level >= 4) {
-      removeHubTextCommandListener();
-      removePrivateChatTextCommandListener();
-      removeExtensionSettingsUpdatedListener();
-    } else {
-      removeHubOutgoingMessageHook();
-      removePrivateChatOutgoingMessageHook();
-    }
+    // if (sessionInfo.system_info.api_feature_level >= 4) {
+    //   removeHubTextCommandListener();
+    //   removePrivateChatTextCommandListener();
+    //   removeExtensionSettingsUpdatedListener();
+    // } else {
+    //   removeHubOutgoingMessageHook();
+    //   removePrivateChatOutgoingMessageHook();
+    // }
 	};
 
 };

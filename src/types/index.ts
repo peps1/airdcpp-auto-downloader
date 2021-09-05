@@ -1,4 +1,9 @@
-export type SearchHistory = {
+export interface SearchHistory {
   name: string,
-  timestamp: Date
+  timestamp: Date,
+  listid: number
+}
+
+export interface DBData {
+  search_history: SearchHistory[]
 }

@@ -15,10 +15,16 @@ Changing the search interval requires stopping and starting the extension
   * file extensions
   * download directory
   * exclude keywords
+  * exclude users (when a user is sole source for item)<sup>1</sup>
   * priority
   * require exact match
   * allow queueing all items from search result
   * remove search term when found
+
+---
+
+  <sup>1</sup> For now list of excluded users don't have to include all special character prefixes or suffixes as we don't do exact matching.<br />Though it means if a user has a very generic nick like 'some' it would also match a user named 'someone'.<br />
+  So be sure to add the users as unique as possible. Feel free to open an issue or let me know what you think of this.
 
 ## Screenshot
 

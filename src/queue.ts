@@ -1,25 +1,32 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 // requeue all items that are older than the search interval
 export const requeueOldestSearches = async () => {
 
   const searchSchedule = global.SETTINGS.getValue('search_interval') * 60 * 1000;
   const requeueTime = Date.now() - ( searchSchedule * 2 );
 
-  for (const item of global.SEARCH_HISTORY) {
+  for (const item of global.DB.data.search_history) {
     if (item.timestamp < new Date(requeueTime)) {
       // older than X minutes
-      global.SEARCH_HISTORY.splice(global.SEARCH_HISTORY.indexOf(item), 1);
+      global.DB.data.search_history.splice(global.DB.data.search_history.indexOf(item), 1);
     }
   }
 
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const getNextPatternFromItem = (queryItem: any, pos: number): [number, string]|undefined => {
+export const getNextPatternFromItem = (queryItem: any, listId: number): [number, string]|undefined => {
   // read item list
   for (const [index, singlePattern] of queryItem.pattern_list.split('\n').entries()) {
 
     let skipItem = false;
-    for (const item of global.SEARCH_HISTORY) {
+
+    global.DB.read();
+    // eslint-disable-next-line no-console
+    console.log(global.DB.data);
+
+    for (const item of global.DB.data.search_history) {
       if (item.name.includes(singlePattern)) {
         // skip item if already in list
         skipItem = true;
@@ -33,10 +40,12 @@ export const getNextPatternFromItem = (queryItem: any, pos: number): [number, st
         return;
       }
 
-      global.SEARCH_HISTORY.push({
+      global.DB.data.search_history.push({
         name: singlePattern,
-        timestamp: new Date()
+        timestamp: new Date(),
+        listid: listId
       });
+      global.DB.write();
       return [index, singlePattern];
     }
   }

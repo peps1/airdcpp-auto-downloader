@@ -1,6 +1,6 @@
 {
   "name": "airdcpp-auto-downloader",
-  "version": "1.0.0-beta.7",
+  "version": "1.0.0-beta.8",
   "description": "BETA TESTING: Extension to add search terms that will be searched in intervals and downloaded when found.",
   "homepage": "https://github.com/peps1/airdcpp-auto-downloader",
   "license": "MIT",
@@ -24,28 +24,31 @@
     "clean": "rimraf dist",
     "dev": "ts-node-dev --respawn --transpileOnly ./src/main.ts",
     "start": "node devtools/watch.js ../dist/main.js",
-    "test": "nyc mocha -r ts-node/register src/tests/*.ts",
+    "test": "nyc mocha --require @babel/register -r ts-node/register src/tests/*.ts",
     "posttest": "nyc report --reporter=json",
     "prepublishOnly": "npm run build",
     "lint": "eslint .",
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "webpack:prod": "cross-env NODE_ENV=production webpack",
+    "webpack:prof": "cross-env NODE_ENV=production PROFILING=1 webpack"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/plugin-transform-runtime": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
     "@babel/preset-typescript": "^7.15.0",
+    "@babel/register": "^7.15.3",
     "@babel/runtime": "^7.15.3",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
     "@types/bytes": "^3.1.1",
     "@types/chai": "^4.2.21",
     "@types/mocha": "^9.0.0",
-    "@types/node": "^16.6.2",
+    "@types/node": "^16.7.1",
     "@types/sinon": "^10.0.2",
     "@types/source-map-support": "^0.5.4",
     "@typescript-eslint/eslint-plugin": "^4.29.2",
     "@typescript-eslint/parser": "^4.29.2",
-    "airdcpp-apisocket": "^2.4.2",
+    "airdcpp-apisocket": "^2.4.3",
     "airdcpp-extension": "^1.5.1",
     "airdcpp-extension-settings": "^1.2.1",
     "babel-loader": "^8.2.2",
@@ -59,7 +62,7 @@
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-react": "^7.24.0",
     "husky": "^7.0.1",
-    "mocha": "^9.0.3",
+    "mocha": "^9.1.0",
     "nodemon": "^2.0.12",
     "nyc": "^15.1.0",
     "rimraf": "^3.0.2",
@@ -72,7 +75,6 @@
     "webpack-cli": "^4.8.0"
   },
   "main": "dist/main",
-  "types": "dist/main",
   "husky": {
     "hooks": {
       "pre-commit": "npm test",
@@ -82,5 +84,8 @@
   "airdcpp": {
     "apiVersion": 1,
     "minApiFeatureLevel": 0
+  },
+  "dependencies": {
+    "lowdb": "^2.1.0"
   }
 }
