@@ -4,7 +4,7 @@ import { Low, JSONFile } from 'lowdb';
 import { DBData } from 'types';
 
 
-export default (extension: any) => {
+export const lowDb = (extension: any) => {
 
   const file = join(extension.logPath, 'db.json');
   const adapter = new JSONFile<DBData>(file);

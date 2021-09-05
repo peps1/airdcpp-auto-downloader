@@ -1,7 +1,7 @@
 'use strict';
 
 
-import lowDb from 'db';
+import { lowDb } from 'db';
 
 import { APISocket, SubscriptionRemoveHandler } from 'airdcpp-apisocket';
 import { onExtensionSettingsUpdated, SettingDefinitions, migrate } from './settings';
