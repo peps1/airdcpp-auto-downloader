@@ -1,12 +1,11 @@
 'use strict';
 
 
-import { lowDb } from 'db';
-
 import { APISocket } from 'airdcpp-apisocket';
 import { SettingDefinitions, migrate } from './settings';
+import { initLowDb } from './db';
+import { initializeSearchInterval, runSearch } from './search';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
-import { initializeSearchInterval } from './search';
 
 // Settings manager docs: https://github.com/airdcpp-web/airdcpp-extension-settings-js
 import SettingsManager from 'airdcpp-extension-settings';
@@ -18,9 +17,11 @@ const CONFIG_VERSION = 2;
 export default (socket: APISocket, extension: any) => {
 
 
-  global.DB = lowDb(extension);
+  // global.DB = lowDb(extension);
   global.SOCKET = socket;
   global.EXTENSION = extension;
+
+  initLowDb();
 
   extension.onStart = async (sessionInfo: SessionInfo) => {
 
@@ -59,8 +60,7 @@ export default (socket: APISocket, extension: any) => {
     };
 
     // Perform an instant search on start
-    // TODO: enable instant search - needs some debugging
-		// searchItem(socket, extension, settings);
+		runSearch();
 
 
   };

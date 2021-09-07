@@ -4,18 +4,32 @@ import { Low, JSONFile } from 'lowdb';
 import { DBData } from 'types';
 
 
-export const lowDb = (extension: any) => {
+let dbObj: Low<DBData>;
 
-  const file = join(extension.logPath, 'db.json');
+const file = join(global.EXTENSION.logPath, 'db.json');
+
+export const initLowDb = () => {
+
   const adapter = new JSONFile<DBData>(file);
-  const db = new Low<DBData>(adapter);
+  dbObj = new Low<DBData>(adapter);
+    // Read data from JSON file, this will set db.data content
+  dbObj.read();
+  dbObj.data = dbObj.data || { search_history:  [] };
 
-  // Read data from JSON file, this will set db.data content
-  db.read();
-  db.data = db.data || { search_history:  [] };
-
-  return db;
+  return dbObj;
 
 };
+
+export const getLowDb = () => {
+
+  if (!dbObj.data) {
+    dbObj = initLowDb();
+    return dbObj;
+  } else {
+    return dbObj;
+  }
+
+};
+
 
 

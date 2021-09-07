@@ -1,4 +1,13 @@
+import { autoDlStats } from './commands/stats';
 import { printEvent, printStatusMessage } from './log';
+
+const helpText = `
+        #######################
+        Auto Downloader
+        #######################
+
+        /autodl-stats\tShow some auto downloader statistics\t\t\t(private, visible only to yourself)
+`;
 
 // https://airdcpp.docs.apiary.io/#reference/hub-sessions/messages/send-chat-message
 // https://airdcpp.docs.apiary.io/#reference/private-chat-sessions/methods/send-chat-message
@@ -27,7 +36,9 @@ const checkLegacyChatCommand = async (message: any, type: string) => {
   // const args = command.slice(1);
 
   if (text === '/help') {
-    return null;
+    printStatusMessage(helpText, type, message.session_id);
+  } else if (text === '/autodl-stats') {
+    autoDlStats(type, message.session_id);
   }
   return null;
 };
@@ -41,6 +52,11 @@ const checkChatCommand = async (type: string, data: any, entityId: string|number
 
   switch (command) {
     case 'help': {
+      printStatusMessage(helpText, type, entityId);
+      break;
+    }
+    case 'autodl-stats': {
+      autoDlStats(type, entityId);
       break;
     }
   }

@@ -1,8 +1,12 @@
-import { startDownload } from './download';
-import { printEvent } from './log';
-import { getNextPatternFromItem, removeSearchItemFromList, requeueOldestSearches } from './queue';
-import { GroupedSearchResult, SearchInstance } from './types/api/search';
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import * as utils from './utils';
+import { GroupedSearchResult, SearchInstance } from './types/api/search';
+import { SearchItem, SearchPatternItem } from 'types';
+import { getLowDb } from './db';
+import { getSearchPattern, removeSearchPatternFromList } from './queue';
+import { printEvent } from './log';
+import { startDownload } from './download';
 
 const onSearchResultAdded = (results: GroupedSearchResult[], result: any) => {
   results.push(result.result);
@@ -17,7 +21,7 @@ const onSearchResultUpdated = (results: GroupedSearchResult[], result: any) => {
 
 export const initializeSearchInterval = async (searchInterval: number) => {
   global.SEARCH_INTERVAL = setInterval(() => {
-    searchItem();
+    runSearch();
   }, searchInterval * 60 * 1000);
 };
 
@@ -27,34 +31,18 @@ const getItemWithHighestRelevance = (results: GroupedSearchResult[]) => {
   return result;
 };
 
-export const searchItem = async () => {
+export const runSearch = async () => {
 
   // Anything to search for?
-  const itemCount = global.SETTINGS.getValue('search_items').length;
-  if (itemCount === 0) {
+  const searchLists = global.SETTINGS.getValue('search_items').length;
+  if (searchLists === 0) {
     return;
   }
 
-  // Get a random item to search for
-  // TODO: pick random item, check item against recently searched list, if on list pick another, add item to list of recently searched (save in settings.json)
-  // TODO: iterate through whole item list per search_interval
-  const listId = Math.floor(Math.random() * itemCount);
-
-  const itemList = global.SETTINGS.getValue('search_items')[listId];
-
-  // The item might actually be a list of items
-
   // Get next item to search
-  let pattern = getNextPatternFromItem(itemList, listId);
 
-  if (!pattern) {
-    requeueOldestSearches();
-    // Get next item to search
-    pattern = getNextPatternFromItem(itemList, listId);
-    if (!pattern) {
-      return;
-    }
-  }
+  const pattern = await getSearchPattern();
+  const searchItem: SearchItem = global.SETTINGS.getValue('search_items')[pattern.searchItemId];
 
   // Create search instance, expires after 10 minutes
   const instance: SearchInstance = await global.SOCKET.post('search', {
@@ -65,7 +53,7 @@ export const searchItem = async () => {
   const results: GroupedSearchResult[] = [];
 
   // build search payload
-  const query = utils.buildSearchQuery(itemList, pattern[0]);
+  const query = utils.buildSearchQuery(searchItem, pattern.patternIndex);
 
   // add result listener
   const removeResultAddedListener = await global.SOCKET.addListener(
@@ -93,7 +81,7 @@ export const searchItem = async () => {
         removeResultAddedListener,
         removeResultUpdatedListener
       ];
-      onSearchSent(itemList, listId, instance, listeners, searchInfo, results);
+      onSearchSent(searchItem, pattern, instance, listeners, searchInfo, results);
     }, instance.id
   );
 
@@ -105,19 +93,29 @@ export const searchItem = async () => {
 };
 
 // trigger when search is sent to hub
-const onSearchSent = async (item: string, listId: number, instance: SearchInstance, listeners: any, searchInfo: any, results: GroupedSearchResult[]) => {
+const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, instance: SearchInstance, listeners: any, searchInfo: any, results: GroupedSearchResult[]) => {
 
-  const exactMatch: boolean = global.SETTINGS.getValue('search_items')[listId].exact_match;
-  const queueAll: boolean = global.SETTINGS.getValue('search_items')[listId].queue_all;
-  const queueDupe: string = global.SETTINGS.getValue('search_items')[listId].queue_dupe;
-  const removeDupe: boolean = global.SETTINGS.getValue('search_items')[listId].remove_dupe;
-  const excludedUsers = utils.getExcludedUsers(global.SETTINGS.getValue('search_items')[listId].excluded_users);
+  const wantExactMatch: boolean = global.SETTINGS.getValue('search_items')[pattern.searchItemId].exact_match;
+  const wantQueueAll: boolean = global.SETTINGS.getValue('search_items')[pattern.searchItemId].queue_all;
+  const QueueDupe: string = global.SETTINGS.getValue('search_items')[pattern.searchItemId].queue_dupe;
+  const wantRemoveDupe: boolean = global.SETTINGS.getValue('search_items')[pattern.searchItemId].remove_dupe;
+  const excludedUsers = utils.getExcludedUsers(global.SETTINGS.getValue('search_items')[pattern.searchItemId].excluded_users);
   const searchQueryPattern: string = searchInfo.query.pattern;
 
   let queueResults: GroupedSearchResult[];
 
+  const db = getLowDb();
+
   // Show log message for the user
   printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
+
+  db.data!.search_history.push({
+    pattern: searchQueryPattern,
+    patternIndex: pattern.patternIndex,
+    timestamp: new Date(),
+    searchItemId: pattern.searchItemId
+  });
+  db.write();
 
   // Collect the results for some time
   let waited = 0;
@@ -131,7 +129,7 @@ const onSearchSent = async (item: string, listId: number, instance: SearchInstan
     if ( (waited <= 30 && results.length >= 2) || (waited > 30 && results.length >= 1)) {
 
       // get only the most relevant item if queueAll is disabled
-      if (!queueAll) {
+      if (!wantQueueAll) {
         queueResults= [getItemWithHighestRelevance(results)];
       } else {
         queueResults = results;
@@ -141,30 +139,38 @@ const onSearchSent = async (item: string, listId: number, instance: SearchInstan
       // If there is multiple results we plan to download,
       // we only remove the search term if all of these are dupes.
       // Dupes within the search term will still be skipped below
-      if ( removeDupe && queueResults.every((result) => {
+      if ( wantRemoveDupe && queueResults.every((result) => {
         utils.isDupe(result.dupe);
       }) ) {
-        removeSearchItemFromList(searchQueryPattern, listId);
+        removeSearchPatternFromList(searchQueryPattern, pattern.searchItemId);
       }
 
       // inside use return to skip search result
       queueResults.forEach((result) => {
 
         // check exact match
-        if ( exactMatch && searchQueryPattern !== result.name ) { return; }
+        if ( wantExactMatch && searchQueryPattern !== result.name ) { return; }
 
         // check exclude users
         const nicks = utils.turnNicksIntoArray(result.users.user.nicks);
-        if (result.users.count === 1 && excludedUsers.some( (excludeUser) => {
+        // eslint-disable-next-line no-console
+        console.log(excludedUsers.length);
+        if (excludedUsers.length !== 0 && result.users.count === 1 && excludedUsers.some( (excludeUser) => {
           return nicks.some( (nick) => {
             return nick.includes(excludeUser);
           });
-        })) { return; }
+        })) {
+          // eslint-disable-next-line no-console
+          console.log('excluded user found.. skipping');
+          return; }
 
         // check for dupe
-        switch (queueDupe) {
+        switch (QueueDupe) {
           case 'no_dupes':
-            if ( utils.isDupe(result.dupe) ) { return; }
+            if ( utils.isDupe(result.dupe) ) {
+              // eslint-disable-next-line no-console
+              console.log('dupe found.. skipping');
+              return; }
             break;
           case 'share':
             if ( utils.isQueueDupe(result.dupe) ) { return; }
@@ -176,12 +182,14 @@ const onSearchSent = async (item: string, listId: number, instance: SearchInstan
             break;
         }
 
-        if (queueAll) {
+        if (wantQueueAll) {
           printEvent(`Adding "${result.name}" to queue now.`, 'info');
         } else {
           printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
         }
-        startDownload(item, listId, instance, searchInfo, result);
+        // eslint-disable-next-line no-console
+        console.log('starting download');
+        startDownload(searchItem, pattern.searchItemId, instance, searchInfo, result);
       });
 
       break;

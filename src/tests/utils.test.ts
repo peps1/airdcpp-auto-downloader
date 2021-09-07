@@ -3,8 +3,7 @@ import { describe, it } from 'mocha';
 // import sinon from 'sinon';
 import assert from 'assert';
 
-import { formatSize, getLastDirectory, sleep , buildSearchQuery, turnNicksIntoArray } from '../utils';
-
+import { formatSize, getLastDirectory, sleep , buildSearchQuery, turnNicksIntoArray, getExcludedUsers } from '../utils';
 
 describe('buildSearchQuery', () => {
   it('Should properly parsed search queries', () => {
@@ -26,9 +25,24 @@ describe('buildSearchQuery', () => {
 
 describe('turnNicksIntoArray', () => {
   it('Should turn string of nicks into clean array', () => {
-    expect(turnNicksIntoArray('#[prefix]-user/name (--[prefix-user/name]--, [prefix]username, [prefix]username, [prefix]username, username )')
+    expect(
+      turnNicksIntoArray(
+        '#[prefix]-user/name (--[prefix-user/name]--, [prefix]username, [prefix]username, [prefix]username, username )'
+      )
     ).to.deep.equal(
       [ '#[prefix]-user/name', '--[prefix-user/name]--', '[prefix]username', '[prefix]username', '[prefix]username', 'username' ]
+    );
+  });
+});
+
+describe('getExcludedUsers', () => {
+  it('Should return array of users when users are listed', () => {
+    expect(
+      getExcludedUsers(
+        '--[prefix-user/name]--;username2;[prefix]username'
+      )
+    ).to.equal(
+      [ '--[prefix-user/name]--', 'username2', '[prefix]username']
     );
   });
 });

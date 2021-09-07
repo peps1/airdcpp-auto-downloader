@@ -1,5 +1,7 @@
 'use strict';
 
+import { getLowDb } from './db';
+import { SearchHistory } from './types';
 import * as API from './types/api';
 import { DupeEnum } from './types/api';
 
@@ -110,6 +112,20 @@ export const formatSize = (fileSizeInBytes: number): string => {
   return result;
 };
 
+// Format nicely (151 days 18 hours 58 minutes 25 seconds)
+export const formatTimeSeconds = (seconds: number): string => {
+  const d = Math.floor(seconds / 86400);
+  const h = Math.floor((seconds % 86400) / 3600);
+  const m = Math.floor(((seconds % 86400) % 3600) / 60);
+  const s = Math.floor(((seconds % 86400) % 3600) % 60);
+
+  const dDisplay = d > 0 ? d + (d === 1 ? ' day ' : ' days ') : '';
+  const hDisplay = h > 0 ? h + (h === 1 ? ' hour ' : ' hours ') : '';
+  const mDisplay = m > 0 ? m + (m === 1 ? ' minute ' : ' minutes ') : '';
+  const sDisplay = s > 0 ? s + (s === 1 ? ' second' : ' seconds') : '';
+  return dDisplay + hDisplay + mDisplay + sDisplay;
+};
+
 // Works only for directories
 export const getLastDirectory = (fullPath: string) => {
   const result = fullPath.match(/([^/]+)[/]?$/);
@@ -125,7 +141,7 @@ export const toApiPriority = (id: number) => {
 };
 
 export const getExcludedUsers = (excludedUsers: string): string[] => {
-	return excludedUsers.split(';');
+	return excludedUsers.trim().split(';');
 };
 
 export const turnNicksIntoArray = (nicks: string): string[] => {
@@ -148,5 +164,32 @@ export const buildSearchQuery = (item: { pattern_list: any; extensions: string; 
 		excluded: item.excluded.split(';'),
     file_type: item.file_type,
     min_size: item.min_size * 1024 * 1024, // MiB
+  };
+};
+
+export const searchHistoryStats = async () => {
+  // total list of searched items
+  // oldest date
+  // most recent date
+  // calculate time between oldest and newest date
+
+	const db = getLowDb();
+
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const totalSearches = db.data!.search_history.length;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const timestamps = db.data!.search_history.map((search: SearchHistory) => search.timestamp).sort();
+
+  const oldestSearch = timestamps[0];
+  const newestSearch = timestamps[timestamps.length - 1];
+  const timeDifference = Math.round((+newestSearch - +oldestSearch) / 1000);
+	const timeSince = Math.round((Date.now() - +oldestSearch) / 1000);
+
+  return {
+    totalSearches,
+    oldestSearch,
+    newestSearch,
+    timeDifference,
+		timeSince
   };
 };
