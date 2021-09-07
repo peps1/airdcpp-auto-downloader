@@ -48,7 +48,7 @@ export default (socket: APISocket, extension: any) => {
       socket.addHook('private_chat', 'private_chat_outgoing_message_hook', onOutgoingPrivateMessage, subscriberInfo);
     }
 
-		// Set interval
+    // Set interval
     initializeSearchInterval(global.SETTINGS.getValue('search_interval'));
 
     global.SETTINGS.onValuesUpdated = async (updatedValues: any) => {
@@ -60,14 +60,14 @@ export default (socket: APISocket, extension: any) => {
     };
 
     // Perform an instant search on start
-		runSearch();
+    runSearch();
 
 
   };
 
-	extension.onStop = async () => {
-		// We can't search without a socket
-		clearInterval(global.SEARCH_INTERVAL);
-	};
+  extension.onStop = async () => {
+    // We can't search without a socket
+    clearInterval(global.SEARCH_INTERVAL);
+  };
 
 };

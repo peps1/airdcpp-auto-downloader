@@ -97,7 +97,7 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
 
   const wantExactMatch: boolean = global.SETTINGS.getValue('search_items')[pattern.searchItemId].exact_match;
   const wantQueueAll: boolean = global.SETTINGS.getValue('search_items')[pattern.searchItemId].queue_all;
-  const QueueDupe: string = global.SETTINGS.getValue('search_items')[pattern.searchItemId].queue_dupe;
+  const queueDupe: string = global.SETTINGS.getValue('search_items')[pattern.searchItemId].queue_dupe;
   const wantRemoveDupe: boolean = global.SETTINGS.getValue('search_items')[pattern.searchItemId].remove_dupe;
   const excludedUsers = utils.getExcludedUsers(global.SETTINGS.getValue('search_items')[pattern.searchItemId].excluded_users);
   const searchQueryPattern: string = searchInfo.query.pattern;
@@ -165,7 +165,7 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
           return; }
 
         // check for dupe
-        switch (QueueDupe) {
+        switch (queueDupe) {
           case 'no_dupes':
             if ( utils.isDupe(result.dupe) ) {
               // eslint-disable-next-line no-console
