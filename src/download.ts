@@ -1,5 +1,5 @@
-import { SearchItem } from 'types';
-import { GroupedSearchResult, SearchInstance } from 'types/api/search';
+import { SearchItem } from './types';
+import { GroupedSearchResult, SearchInstance } from './types/api/search';
 import { printEvent } from './log';
 import { removeSearchPatternFromList } from './queue';
 import { toApiPriority } from './utils';

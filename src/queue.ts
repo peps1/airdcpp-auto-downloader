@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { getLowDb } from './db';
-import { SearchHistory, SearchPatternItem } from 'types';
+import { SearchHistory, SearchPatternItem } from './types';
 
 
 export const getSearchPattern = async () => {

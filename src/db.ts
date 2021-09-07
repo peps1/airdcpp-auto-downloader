@@ -1,7 +1,7 @@
 
 import { join } from 'path';
 import { Low, JSONFile } from 'lowdb';
-import { DBData } from 'types';
+import { DBData } from './types';
 
 
 let dbObj: Low<DBData>;

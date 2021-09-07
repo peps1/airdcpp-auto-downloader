@@ -2,7 +2,7 @@
 
 import * as utils from './utils';
 import { GroupedSearchResult, SearchInstance } from './types/api/search';
-import { SearchItem, SearchPatternItem } from 'types';
+import { SearchItem, SearchPatternItem } from './types';
 import { getLowDb } from './db';
 import { getSearchPattern, removeSearchPatternFromList } from './queue';
 import { printEvent } from './log';
