@@ -6,28 +6,27 @@ import { DBData } from './types';
 
 let dbObj: Low<DBData>;
 
-const file = join(global.EXTENSION.logPath, 'db.json');
 
-export const initLowDb = () => {
+// TODO: fix path
+const file = join('/tmp', 'db.json');
+
+export const initLowDb = async () => {
 
   const adapter = new JSONFile<DBData>(file);
   dbObj = new Low<DBData>(adapter);
     // Read data from JSON file, this will set db.data content
-  dbObj.read();
+  await dbObj.read();
+  console.log(dbObj.data);
   dbObj.data = dbObj.data || { search_history:  [] };
 
   return dbObj;
 
 };
 
-export const getLowDb = () => {
+export const getLowDb = async () => {
 
-  if (!dbObj.data) {
-    dbObj = initLowDb();
-    return dbObj;
-  } else {
-    return dbObj;
-  }
+  await dbObj.read();
+  return dbObj;
 
 };
 

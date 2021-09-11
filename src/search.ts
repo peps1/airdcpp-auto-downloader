@@ -40,8 +40,12 @@ export const runSearch = async () => {
   }
 
   // Get next item to search
-
   const pattern = await getSearchPattern();
+
+  // don't search for empty strings
+  if (!pattern) {
+    return;
+  }
   const searchItem: SearchItem = global.SETTINGS.getValue('search_items')[pattern.searchItemId];
 
   // Create search instance, expires after 10 minutes
@@ -104,7 +108,7 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
 
   let queueResults: GroupedSearchResult[];
 
-  const db = getLowDb();
+  const db = await getLowDb();
 
   // Show log message for the user
   printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
@@ -153,8 +157,6 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
 
         // check exclude users
         const nicks = utils.turnNicksIntoArray(result.users.user.nicks);
-        // eslint-disable-next-line no-console
-        console.log(excludedUsers.length);
         if (excludedUsers.length !== 0 && result.users.count === 1 && excludedUsers.some( (excludeUser) => {
           return nicks.some( (nick) => {
             return nick.includes(excludeUser);

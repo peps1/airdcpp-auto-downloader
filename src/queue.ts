@@ -5,17 +5,17 @@ import { SearchHistory, SearchPatternItem } from './types';
 
 export const getSearchPattern = async () => {
 
-  const searchItemLength = global.SETTINGS.getValue('search_items').length;
-
-  // eslint-disable-next-line no-console
-  console.log(searchItemLength);
   let pattern: undefined|SearchPatternItem;
 
   while (!pattern) {
     // iterate search lists
     for (let searchItemId = 0; searchItemId < global.SETTINGS.getValue('search_items').length; searchItemId++) {
       const searchItem = global.SETTINGS.getValue('search_items')[searchItemId];
-      pattern = getNextPatternFromItem(searchItem, searchItemId);
+
+      // skip empty searchItems
+      if (!searchItem.pattern_list) { break; };
+
+      pattern = await getNextPatternFromItem(searchItem, searchItemId);
       if (!pattern) {
         break;
       } else {
@@ -23,11 +23,10 @@ export const getSearchPattern = async () => {
       }
     }
 
-    // eslint-disable-next-line no-console
-    console.log('need to find oldest..');
-
     // all patterns from all search items were searched, we'll continue from the oldest
-    const oldest = getOldestSearchHistory();
+    const oldest = await getOldestSearchHistory();
+
+    if (!oldest) { return; };
 
     pattern = {
       searchItemId: oldest.searchItemId,
@@ -40,15 +39,14 @@ export const getSearchPattern = async () => {
 
 };
 
-export const getNextPatternFromItem = (searchItem: any, searchItemId: number): SearchPatternItem|undefined => {
+export const getNextPatternFromItem = async (searchItem: any, searchItemId: number): Promise<SearchPatternItem | undefined> => {
   // read item list
   for (const [patternIndex, singlePattern] of searchItem.pattern_list.split('\n').entries()) {
 
     let skipItem = false;
 
     // iterate over search history
-
-    const db = getLowDb();
+    const db = await getLowDb();
 
     if (db.data!.search_history.some( (i: any) => i.pattern === singlePattern)) {
       skipItem = true;
@@ -90,11 +88,12 @@ export const removeSearchPatternFromList = async (searchPattern: string, searchI
 
 };
 
-const getOldestSearchHistory = () => {
+const getOldestSearchHistory = async () => {
 
-  const db = getLowDb();
+  const db = await getLowDb();
 
   const data: SearchHistory[] = db.data!.search_history;
+  if (!data.length) { return; };
   const result = data.reduce((prev, cur) => cur.timestamp < prev.timestamp ? cur : prev);
 
   const indexOfOldest = data.findIndex((item) => item.pattern === result.pattern);
@@ -102,8 +101,7 @@ const getOldestSearchHistory = () => {
   db.data!.search_history.splice(indexOfOldest, 1);
 
 
-  // make sure oldest is also still in settings!
-  // don't search empty strings
+  // TODO: make sure oldest is also still in settings!
 
 
   db.write();

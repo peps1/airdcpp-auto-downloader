@@ -140,8 +140,9 @@ export const toApiPriority = (id: number) => {
   return id === priorityAutoId ? null : id;
 };
 
+// return empty array instead of single empty string in array
 export const getExcludedUsers = (excludedUsers: string): string[] => {
-  return excludedUsers.trim().split(';');
+  return !excludedUsers ? [] : excludedUsers.trim().split(';');
 };
 
 export const turnNicksIntoArray = (nicks: string): string[] => {
@@ -173,7 +174,7 @@ export const searchHistoryStats = async () => {
   // most recent date
   // calculate time between oldest and newest date
 
-  const db = getLowDb();
+  const db = await getLowDb();
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const totalSearches = db.data!.search_history.length;

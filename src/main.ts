@@ -21,9 +21,9 @@ export default (socket: APISocket, extension: any) => {
   global.SOCKET = socket;
   global.EXTENSION = extension;
 
-  initLowDb();
-
   extension.onStart = async (sessionInfo: SessionInfo) => {
+
+    await initLowDb();
 
     // INITIALIZATION
     global.SETTINGS = SettingsManager(socket, {
