@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 // import sinon from 'sinon';
 import assert from 'assert';
 
-import { formatSize, getLastDirectory, sleep , buildSearchQuery, turnNicksIntoArray, getExcludedUsers } from '../utils';
+import { formatSize, getLastDirectory, sleep , buildSearchQuery, turnNicksIntoArray, getExcludedUsers, searchHistoryStats } from '../utils';
 
 describe('buildSearchQuery', () => {
   it('Should properly parsed search queries', () => {
@@ -21,6 +21,23 @@ describe('buildSearchQuery', () => {
       min_size: 129104360767488,
     });
   });
+});
+
+describe('searchHistoryStats', () => {
+  it('Should show zeros and date of ', async () => {
+    expect(await searchHistoryStats()).to.deep.equal(
+      { 'totalSearches': 0,
+        'oldestSearch': 'no searches ran yet',
+        'newestSearch': 'no searches ran yet',
+        'timeDifference': 0,
+        'timeSince': 0
+      }
+    );
+  });
+
+  // test with some small search_history db
+  // const now = new Date();
+  // const clock = sinon.useFakeTimers(now.getTime());
 });
 
 describe('turnNicksIntoArray', () => {
@@ -41,9 +58,15 @@ describe('getExcludedUsers', () => {
       getExcludedUsers(
         '--[prefix-user/name]--;username2;[prefix]username'
       )
-    ).to.equal(
+    ).to.deep.equal(
       [ '--[prefix-user/name]--', 'username2', '[prefix]username']
     );
+  });
+  it('Should return empty array when no users are listed', () => {
+    expect(getExcludedUsers('')).to.deep.equal([]);
+  });
+  it('Should return single element array when one user is listed', () => {
+    expect(getExcludedUsers('--[prefix-user/name]--')).to.deep.equal(['--[prefix-user/name]--']);
   });
 });
 
