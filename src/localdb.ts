@@ -7,7 +7,6 @@ export const getDb = async (dbFilePath: string) => {
   const dbObj = new StormDB(engine);
 
   dbObj.default({ search_history:  [] });
-  // Read data from JSON file, this will set db.data content
 
   return dbObj;
 

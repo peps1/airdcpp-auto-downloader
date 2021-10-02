@@ -168,17 +168,8 @@ export const buildSearchQuery = (item: { pattern_list: any; extensions: string; 
 };
 
 export const searchHistoryStats = async (dbFilePath: string) => {
-  // total list of searched items
-  // oldest date
-  // most recent date
-  // calculate time between oldest and newest date
-
   const db = await getDb(dbFilePath);
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  // const totalSearches = db.data!.search_history.length;
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  // const timestamps = db.data!.search_history.map((search: SearchHistory) => search.timestamp).sort();
   const totalSearches = db.get('search_history').value().length;
   const timestamps: string[] = db.get('search_history').value().map((search: SearchHistory) => search.timestamp).sort();
 

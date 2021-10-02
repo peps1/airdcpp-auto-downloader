@@ -65,7 +65,6 @@ export default (socket: APISocket, extension: any) => {
   };
 
   extension.onStop = async () => {
-    // We can't search without a socket
     clearInterval(global.SEARCH_INTERVAL);
   };
 

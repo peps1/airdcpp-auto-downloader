@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import * as utils from './utils';
 import { GroupedSearchResult, SearchInstance } from './types/api/search';
 import { SearchItem, SearchPatternItem } from './types';

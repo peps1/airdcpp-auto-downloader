@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { getDb } from './localdb';
 import { SearchHistory, SearchPatternItem } from './types';
 
