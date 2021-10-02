@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-// import sinon from 'sinon';
+import sinon from 'sinon';
 import assert from 'assert';
 
 import { formatSize, getLastDirectory, sleep , buildSearchQuery, turnNicksIntoArray, getExcludedUsers, searchHistoryStats } from '../utils';
@@ -24,20 +24,37 @@ describe('buildSearchQuery', () => {
 });
 
 describe('searchHistoryStats', () => {
-  it('Should show zeros and date of ', async () => {
-    expect(await searchHistoryStats()).to.deep.equal(
-      { 'totalSearches': 0,
-        'oldestSearch': 'no searches ran yet',
-        'newestSearch': 'no searches ran yet',
-        'timeDifference': 0,
-        'timeSince': 0
+  it('Should show correct times etc when db is populated', async () => {
+
+    let dbFilePath = "./src/tests/data/db.json"
+    const dateStub = sinon.stub(Date, 'now').returns(1633143902892);
+
+    expect(await searchHistoryStats(dbFilePath)).to.deep.equal(
+      { totalSearches: 2,
+        oldestSearch: '2021-09-06T21:48:29.646Z',
+        newestSearch: '2021-09-06T21:53:29.646Z',
+        timeDifference: 300,
+        timeSince: 2178993
+      }
+    );
+
+    dateStub.restore();
+  });
+
+  it('Should show zeros etc when db is empty', async () => {
+
+    let dbFilePath = "./src/tests/data/db_non_existent.json"
+
+    expect(await searchHistoryStats(dbFilePath)).to.deep.equal(
+      { totalSearches: 0,
+        oldestSearch: 'no searches ran yet',
+        newestSearch: 'no searches ran yet',
+        timeDifference: 0,
+        timeSince: 0,
       }
     );
   });
 
-  // test with some small search_history db
-  // const now = new Date();
-  // const clock = sinon.useFakeTimers(now.getTime());
 });
 
 describe('turnNicksIntoArray', () => {

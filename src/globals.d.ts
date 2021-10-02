@@ -2,11 +2,7 @@
 
 type APISocket = import('airdcpp-apisocket').APISocket;
 
-// type DBData = import('./types').DBData;
-// type Low = import('lowdb/lib').Low<DBData>;
-
-declare var EXTENSION: any;
-// declare var DB: Low;
+declare var DbPath: string;
 declare var SETTINGS: any;
 declare var SOCKET: APISocket;
 declare var SEARCH_INTERVAL: ReturnType<typeof setInterval>;

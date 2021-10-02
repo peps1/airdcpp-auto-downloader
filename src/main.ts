@@ -3,7 +3,7 @@
 
 import { APISocket } from 'airdcpp-apisocket';
 import { SettingDefinitions, migrate } from './settings';
-import { initLowDb } from './db';
+import { getDb } from './localdb';
 import { initializeSearchInterval, runSearch } from './search';
 import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from './chat';
 
@@ -19,11 +19,11 @@ export default (socket: APISocket, extension: any) => {
 
   // global.DB = lowDb(extension);
   global.SOCKET = socket;
-  global.EXTENSION = extension;
+  global.DbPath = extension.logPath + '/db.json';
 
   extension.onStart = async (sessionInfo: SessionInfo) => {
 
-    await initLowDb();
+    await getDb(global.DbPath);
 
     // INITIALIZATION
     global.SETTINGS = SettingsManager(socket, {

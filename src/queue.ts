@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { getLowDb } from './db';
+import { getDb } from './localdb';
 import { SearchHistory, SearchPatternItem } from './types';
 
 
@@ -46,9 +46,9 @@ export const getNextPatternFromItem = async (searchItem: any, searchItemId: numb
     let skipItem = false;
 
     // iterate over search history
-    const db = await getLowDb();
+    const db = await getDb(global.DbPath);
 
-    if (db.data!.search_history.some( (i: any) => i.pattern === singlePattern)) {
+    if (db.get('search_history').value().some( (i: any) => i.pattern === singlePattern)) {
       skipItem = true;
     }
 
@@ -90,21 +90,21 @@ export const removeSearchPatternFromList = async (searchPattern: string, searchI
 
 const getOldestSearchHistory = async () => {
 
-  const db = await getLowDb();
+  const db = await getDb(global.DbPath);
 
-  const data: SearchHistory[] = db.data!.search_history;
+  const data: SearchHistory[] = db.get('search_history').value();
   if (!data.length) { return; };
   const result = data.reduce((prev, cur) => cur.timestamp < prev.timestamp ? cur : prev);
 
   const indexOfOldest = data.findIndex((item) => item.pattern === result.pattern);
 
-  db.data!.search_history.splice(indexOfOldest, 1);
+  db.get('search_history').value().splice(indexOfOldest, 1);
 
 
   // TODO: make sure oldest is also still in settings!
 
 
-  db.write();
+  db.save();
 
   // eslint-disable-next-line no-console
   console.log(`oldest search item is: ${JSON.stringify(result)}`);

@@ -1,6 +1,5 @@
 'use strict';
-
-import { getLowDb } from './db';
+import { getDb } from './localdb';
 import { SearchHistory } from './types';
 import * as API from './types/api';
 import { DupeEnum } from './types/api';
@@ -168,23 +167,37 @@ export const buildSearchQuery = (item: { pattern_list: any; extensions: string; 
   };
 };
 
-export const searchHistoryStats = async () => {
+export const searchHistoryStats = async (dbFilePath: string) => {
   // total list of searched items
   // oldest date
   // most recent date
   // calculate time between oldest and newest date
 
-  const db = await getLowDb();
+  const db = await getDb(dbFilePath);
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const totalSearches = db.data!.search_history.length;
+  // const totalSearches = db.data!.search_history.length;
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const timestamps = db.data!.search_history.map((search: SearchHistory) => search.timestamp).sort();
+  // const timestamps = db.data!.search_history.map((search: SearchHistory) => search.timestamp).sort();
+  const totalSearches = db.get('search_history').value().length;
+  const timestamps: string[] = db.get('search_history').value().map((search: SearchHistory) => search.timestamp).sort();
 
-  const oldestSearch = timestamps[0];
-  const newestSearch = timestamps[timestamps.length - 1];
-  const timeDifference = Math.round((+newestSearch - +oldestSearch) / 1000);
-  const timeSince = Math.round((Date.now() - +oldestSearch) / 1000);
+  let timeDifference: number;
+  let timeSince: number;
+  let oldestSearch: Date|string;
+  let newestSearch: Date|string;
+
+  if (timestamps.length >= 2) {
+    oldestSearch = timestamps[0];
+    newestSearch = timestamps[timestamps.length - 1];
+    timeDifference = Math.round((new Date(newestSearch).getTime() - new Date(oldestSearch).getTime()) / 1000) || 0;
+    timeSince = Math.round((Date.now() - new Date(oldestSearch).getTime()) / 1000) || 0;
+  } else {
+    oldestSearch = 'no searches ran yet';
+    newestSearch = 'no searches ran yet';
+    timeDifference = 0;
+    timeSince = 0;
+  }
 
   return {
     totalSearches,

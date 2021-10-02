@@ -3,7 +3,7 @@
 import * as utils from './utils';
 import { GroupedSearchResult, SearchInstance } from './types/api/search';
 import { SearchItem, SearchPatternItem } from './types';
-import { getLowDb } from './db';
+import { getDb } from './localdb';
 import { getSearchPattern, removeSearchPatternFromList } from './queue';
 import { printEvent } from './log';
 import { startDownload } from './download';
@@ -108,18 +108,18 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
 
   let queueResults: GroupedSearchResult[];
 
-  const db = await getLowDb();
+  const db = await getDb();
 
   // Show log message for the user
   printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
 
-  db.data!.search_history.push({
+  db.get('search_history').value().push({
     pattern: searchQueryPattern,
     patternIndex: pattern.patternIndex,
     timestamp: new Date(),
     searchItemId: pattern.searchItemId
   });
-  db.write();
+  db.save();
 
   // Collect the results for some time
   let waited = 0;
