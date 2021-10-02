@@ -19,7 +19,7 @@ export default (socket: APISocket, extension: any) => {
 
   // global.DB = lowDb(extension);
   global.SOCKET = socket;
-  global.DbPath = extension.logPath + '/db.json';
+  global.DbPath = extension.settingsPath + 'db.json';
 
   extension.onStart = async (sessionInfo: SessionInfo) => {
 

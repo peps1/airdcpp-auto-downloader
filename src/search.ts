@@ -108,7 +108,7 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
 
   let queueResults: GroupedSearchResult[];
 
-  const db = await getDb();
+  const db = await getDb(global.DbPath);
 
   // Show log message for the user
   printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');

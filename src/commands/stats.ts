@@ -2,7 +2,7 @@ import { printStatusMessage } from '../log';
 import { formatTimeSeconds, searchHistoryStats } from '../utils';
 
 export const autoDlStats = async (type: string, entityId: string|number) => {
-  const stats = await searchHistoryStats();
+  const stats = await searchHistoryStats(global.DbPath);
   const oldest = stats.oldestSearch;
   const newest = stats.newestSearch;
   const output = `

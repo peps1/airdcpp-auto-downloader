@@ -8,7 +8,7 @@ const profiling = !!process.env.PROFILING;
 
 const plugins = [
   // Optional binary requires that should be ignored
-  new webpack.IgnorePlugin(/.*\/build\/.*\/(validation|bufferutil)/),
+  new webpack.IgnorePlugin({ resourceRegExp:/.*\/build\/.*\/(validation|bufferutil)/}),
   new webpack.DefinePlugin({
     'EXTENSION_NAME': JSON.stringify(packageJson.name),
     'EXTENSION_VERSION': JSON.stringify(packageJson.version),

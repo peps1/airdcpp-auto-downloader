@@ -80,7 +80,7 @@ const searchQueryDefinitions = [
   }, {
     key: 'exact_match',
     title: 'Require an exact match',
-    default_value: false,
+    default_value: true,
     type: 'boolean',
   }, {
     key: 'queue_all',
