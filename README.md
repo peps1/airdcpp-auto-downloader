@@ -20,6 +20,7 @@ Changing the search interval requires stopping and starting the extension
   * require exact match
   * allow queueing all items from search result
   * remove search term when found
+  * handle dupes
 
 ---
 

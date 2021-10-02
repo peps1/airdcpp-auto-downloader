@@ -30,3 +30,18 @@ export interface SearchItem {
   priority: number,
   target_directory: string
 }
+
+export interface ServerInfo {
+  address: string,
+  secure: boolean
+}
+
+export interface Extension {
+  name: string,
+  configPath: string,
+  logPath: string,
+  debugMode: boolean,
+  server: ServerInfo,
+  onStart: any,
+  onStop: any
+}

@@ -106,8 +106,6 @@ const getOldestSearchHistory = async () => {
 
   db.save();
 
-  // eslint-disable-next-line no-console
-  console.log(`oldest search item is: ${JSON.stringify(result)}`);
   return result;
 };
 

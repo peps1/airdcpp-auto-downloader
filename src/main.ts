@@ -17,9 +17,8 @@ const CONFIG_VERSION = 2;
 export default (socket: APISocket, extension: any) => {
 
 
-  // global.DB = lowDb(extension);
   global.SOCKET = socket;
-  global.DbPath = extension.settingsPath + 'db.json';
+  global.DbPath = extension.configPath + 'db.json';
 
   extension.onStart = async (sessionInfo: SessionInfo) => {
 

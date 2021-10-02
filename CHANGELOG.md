@@ -1,10 +1,10 @@
 # Changelog
 
-## [v1.0.0-beta8](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.8) (2021-08-24)
+## [v1.0.0-beta8](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.8) (2021-10-02)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.7...v1.0.0-beta.8)
 
 ### Fixed
-// TODO * When using multiple lists it would keep repeat searching items from first list more often than others.
+* When using multiple lists it would keep repeat searching items from first list more often than others.
 * Exclude keywords: used wrong option, also updated config parameter and migrating old config. (Thanks for reporting!) [#13](https://github.com/peps1/airdcpp-auto-downloader/issues/13)
 
 ### Added

@@ -162,16 +162,12 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
             return nick.includes(excludeUser);
           });
         })) {
-          // eslint-disable-next-line no-console
-          console.log('excluded user found.. skipping');
           return; }
 
         // check for dupe
         switch (queueDupe) {
           case 'no_dupes':
             if ( utils.isDupe(result.dupe) ) {
-              // eslint-disable-next-line no-console
-              console.log('dupe found.. skipping');
               return; }
             break;
           case 'share':
@@ -189,8 +185,6 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
         } else {
           printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
         }
-        // eslint-disable-next-line no-console
-        console.log('starting download');
         startDownload(searchItem, pattern.searchItemId, instance, searchInfo, result);
       });
 
