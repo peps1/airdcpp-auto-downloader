@@ -34,7 +34,7 @@ describe('searchHistoryStats', () => {
         oldestSearch: '2021-09-06T21:48:29.646Z',
         newestSearch: '2021-09-06T21:53:29.646Z',
         timeDifference: 300,
-        timeSince: 2178993
+        timeSince: 2178693
       }
     );
 

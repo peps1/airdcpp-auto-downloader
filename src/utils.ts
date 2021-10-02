@@ -191,7 +191,7 @@ export const searchHistoryStats = async (dbFilePath: string) => {
     oldestSearch = timestamps[0];
     newestSearch = timestamps[timestamps.length - 1];
     timeDifference = Math.round((new Date(newestSearch).getTime() - new Date(oldestSearch).getTime()) / 1000) || 0;
-    timeSince = Math.round((Date.now() - new Date(oldestSearch).getTime()) / 1000) || 0;
+    timeSince = Math.round((Date.now() - new Date(newestSearch).getTime()) / 1000) || 0;
   } else {
     oldestSearch = 'no searches ran yet';
     newestSearch = 'no searches ran yet';
