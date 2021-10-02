@@ -14,9 +14,11 @@ export const getSearchPattern = async () => {
       // skip empty searchItems
       if (!searchItem.pattern_list) { break; };
 
+      // get single search pattern from search item
       pattern = await getNextPatternFromItem(searchItem, searchItemId);
       if (!pattern) {
-        break;
+        // if no pattern found, we check the next search item / list
+        continue;
       } else {
         return pattern;
       }
@@ -101,9 +103,7 @@ const getOldestSearchHistory = async () => {
 
 
   // TODO: make sure oldest is also still in settings!
-
-
-  db.save();
+  // await db.save();
 
   return result;
 };

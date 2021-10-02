@@ -66,6 +66,8 @@ export default (socket: APISocket, extension: any) => {
 
   extension.onStop = async () => {
     clearInterval(global.SEARCH_INTERVAL);
+    const db = await getDb(global.DbPath);
+    await db.save();
   };
 
 };
