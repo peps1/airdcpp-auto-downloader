@@ -10,6 +10,7 @@ import { onChatCommand, onOutgoingHubMessage, onOutgoingPrivateMessage } from '.
 // Settings manager docs: https://github.com/airdcpp-web/airdcpp-extension-settings-js
 import SettingsManager from 'airdcpp-extension-settings';
 import { SessionInfo } from './types/api';
+import { deDupeSearchHistory } from 'utils';
 
 
 const CONFIG_VERSION = 2;
@@ -22,7 +23,12 @@ export default (socket: APISocket, extension: any) => {
 
   extension.onStart = async (sessionInfo: SessionInfo) => {
 
-    await getDb(global.DbPath);
+    const db = await getDb(global.DbPath);
+
+    // on start do dedupe of db once
+    // TODO: disable in next version or latest at final 1.0
+    const dedupedDb = deDupeSearchHistory(db.get('search_history').value());
+    await db.get('search_history').set(dedupedDb).save();
 
     // INITIALIZATION
     global.SETTINGS = SettingsManager(socket, {

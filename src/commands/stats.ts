@@ -7,11 +7,11 @@ export const autoDlStats = async (type: string, entityId: string|number) => {
   const newest = stats.newestSearch;
   const output = `
   -=[ airdcpp-auto-downloader https://github.com/peps1/airdcpp-auto-downloader ]=-
-  -=[ Total Searches: ${stats.totalSearches} ]=-
-  -=[ Oldest Search: ${oldest.toString()} ]=-
-  -=[ Most recent Search: ${newest.toString()} ]=-
-  -=[ Time Since: ${formatTimeSeconds(stats.timeSince)} ]=-
-  -=[ Time Diff: ${formatTimeSeconds(stats.timeDifference)} ]=-
+  -=[ Searches tracked: ${stats.totalSearches} ]=-
+  -=[ Oldest Search: ${new Date(oldest).toLocaleString()} ]=-
+  -=[ Most recent Search: ${new Date(newest).toLocaleString()} ]=-
+  -=[ Time since last search: ${formatTimeSeconds(stats.timeSince)} ]=-
+  -=[ Time between oldest / newest: ${formatTimeSeconds(stats.timeDifference)} ]=-
     `;
   printStatusMessage(output, type, entityId);
 };

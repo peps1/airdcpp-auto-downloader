@@ -1,5 +1,11 @@
 # Changelog
 
+## [v1.0.0-beta10](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.10) (2021-10-03)
+[Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.9...v1.0.0-beta.10)
+
+### Fixed
+* When all items from all lists are searched, it would keep repeating the last item searched.
+
 ## [v1.0.0-beta9](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.9) (2021-10-02)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.8...v1.0.0-beta.9)
 

@@ -5,6 +5,7 @@ import { getDb } from './localdb';
 import { getSearchPattern, removeSearchPatternFromList } from './queue';
 import { printEvent } from './log';
 import { startDownload } from './download';
+import { getIndexToReplaceItem } from './utils';
 
 const onSearchResultAdded = (results: GroupedSearchResult[], result: any) => {
   results.push(result.result);
@@ -111,13 +112,23 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
   // Show log message for the user
   printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
 
-  db.get('search_history').value().push({
+
+  const newObj = {
     pattern: searchQueryPattern,
     patternIndex: pattern.patternIndex,
     timestamp: new Date(),
     searchItemId: pattern.searchItemId
-  });
-  db.save();
+  };
+
+  // update timestamp in search_history
+  const index = getIndexToReplaceItem(db.get('search_history').value(), newObj);
+  if (index === -1) {
+    db.get('search_history').value().push(newObj);
+  } else {
+    db.get('search_history').get(index).get('timestamp').set(new Date());
+  }
+
+  await db.save();
 
   // Collect the results for some time
   let waited = 0;

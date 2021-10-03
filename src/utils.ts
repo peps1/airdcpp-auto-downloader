@@ -198,3 +198,16 @@ export const searchHistoryStats = async (dbFilePath: string) => {
     timeSince
   };
 };
+
+// if object with same pattern exists already, return the index in array
+export const getIndexToReplaceItem = (array: SearchHistory[], object: SearchHistory) => {
+  const index = array.findIndex((element) => element.pattern === object.pattern);
+  return index;
+};
+
+// remove all duplicate patterns from array and return new array
+export const deDupeSearchHistory = (array: SearchHistory[]) => {
+  const patterns = array.map(o => o.pattern);
+  const filtered = array.filter(({pattern}, index) => !patterns.includes(pattern, index + 1));
+  return filtered;
+};
