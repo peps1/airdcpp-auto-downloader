@@ -1,3 +1,4 @@
+import { getIndexForPattern } from 'utils';
 import { getDb } from './localdb';
 import { SearchHistory, SearchItem, SearchPatternItem } from './types';
 
@@ -95,18 +96,47 @@ const getOldestSearchHistory = async () => {
 
   const db = await getDb(global.DbPath);
 
-  const data: SearchHistory[] = db.get('search_history').value();
-  if (!data.length) { return; };
-  const result = data.reduce((prev, cur) => cur.timestamp < prev.timestamp ? cur : prev);
+  let result: SearchHistory|undefined;
 
-  const indexOfOldest = data.findIndex((item) => item.pattern === result.pattern);
+  while (!result) {
 
-  db.get('search_history').value().splice(indexOfOldest, 1);
+    // db might be empty
+    if (!db.get('search_history').value().length) { return; };
 
+    // iterate items, leaving only the oldest
+    const oldest = (db.get('search_history').value() as SearchHistory[]).reduce((prev, cur) => cur.timestamp < prev.timestamp ? cur : prev);
 
-  // TODO: make sure oldest is also still in settings!
-  // await db.save();
+    // iterate through settings search_items
+    let isOrphanedRecord = false;
+    for (const searchItem of (global.SETTINGS.getValue('search_items') as SearchItem[])) {
 
-  return result;
+      // if found, return result
+      if (searchItem.pattern_list.split('\n').some((pattern) => pattern === oldest.pattern)) {
+        result = oldest;
+        db.save();
+        return result;
+      } else {
+        // use variable so we iterate through everything before deciding if it should be deleted
+        isOrphanedRecord = true;
+      }
+    }
+
+    if (isOrphanedRecord) {
+      // remove from db
+      const index = getIndexForPattern(db.get('search_history').value(), oldest);
+      try {
+        db.get('search_history').get(index).delete(true);
+        global.SOCKET.logger.verbose('Deleted orphaned record from db..');
+        global.SOCKET.logger.verbose(db.get('search_history').value());
+      } catch {
+        global.SOCKET.logger.error('Problem Deleting orphaned record from db..');
+        return;
+      }
+
+    }
+
+  }
+  return;
+
 };
 
