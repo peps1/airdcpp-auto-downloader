@@ -44,7 +44,12 @@ export const runSearch = async () => {
   // don't search for empty strings
   if (!pattern) {
     return;
+  } else if (pattern.singlePattern.length === 0) {
+    global.SOCKET.logger.verbose('Skipping empty pattern...');
+    return;
   }
+
+  // get search settings for this pattern
   const searchItem: SearchItem = global.SETTINGS.getValue('search_items')[pattern.searchItemId];
 
   // Create search instance, expires after 10 minutes
