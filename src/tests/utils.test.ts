@@ -6,14 +6,22 @@ import assert from 'assert';
 import { formatSize, getLastDirectory, sleep , buildSearchQuery, turnNicksIntoArray, getExcludedUsers, searchHistoryStats } from '../utils';
 
 describe('buildSearchQuery', () => {
-  it('Should properly parsed search queries', () => {
+  it('Should properly parse search queries', () => {
     expect(buildSearchQuery({
       pattern_list: 'Something1-Searching\nSomething-Else',
       extensions: '.mp3;.mov',
       excluded: 'word1;word2',
       file_type: 'Folder',
+      excluded_users: 'usera;userb',
+      exact_match: true,
+      priority: 0,
+      queue_all: false,
+      queue_dupe: 'no_dupes',
+      remove_after_found: false,
+      remove_dupe: false,
+      target_directory: '',
       min_size: 123123513,
-    })).to.deep.equal({
+    }, 'Something1-Searching')).to.deep.equal({
       pattern: 'Something1-Searching',
       extensions: ['.mp3','.mov'],
       excluded: ['word1','word2'],
