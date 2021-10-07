@@ -1,5 +1,5 @@
 import { getDb } from './localdb';
-import { SearchHistory, SearchPatternItem } from './types';
+import { SearchHistory, SearchItem, SearchPatternItem } from './types';
 
 
 export const getSearchPattern = async () => {
@@ -40,7 +40,8 @@ export const getSearchPattern = async () => {
 
 };
 
-export const getNextPatternFromItem = async (searchItem: any, searchItemId: number): Promise<SearchPatternItem | undefined> => {
+// process single search item
+export const getNextPatternFromItem = async (searchItem: SearchItem, searchItemId: number): Promise<SearchPatternItem | undefined> => {
   // read item list
   for (const [patternIndex, singlePattern] of searchItem.pattern_list.split('\n').entries()) {
 
@@ -49,15 +50,16 @@ export const getNextPatternFromItem = async (searchItem: any, searchItemId: numb
     // iterate over search history
     const db = await getDb(global.DbPath);
 
-    if (db.get('search_history').value().some( (i: any) => i.pattern === singlePattern)) {
+    // we skip the item if it's in the db already
+    if (db.get('search_history').value().some( (item: SearchHistory) => item.pattern === singlePattern)) {
       skipItem = true;
     }
 
     if (!skipItem) {
 
-      // exit when string is empty
+      // skip when string is empty
       if (singlePattern.trim().length === 0) {
-        return;
+        continue;
       }
 
       return {searchItemId, patternIndex, singlePattern};

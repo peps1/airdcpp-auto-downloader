@@ -1,6 +1,5 @@
 'use strict';
 
-
 import { APISocket } from 'airdcpp-apisocket';
 import { SettingDefinitions, migrate } from './settings';
 import { getDb } from './localdb';
