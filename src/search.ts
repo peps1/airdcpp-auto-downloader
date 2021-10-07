@@ -56,7 +56,7 @@ export const runSearch = async () => {
   const results: GroupedSearchResult[] = [];
 
   // build search payload
-  const query = utils.buildSearchQuery(searchItem, pattern.patternIndex);
+  const query = utils.buildSearchQuery(searchItem, pattern.singlePattern);
 
   // add result listener
   const removeResultAddedListener = await global.SOCKET.addListener(

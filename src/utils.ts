@@ -1,6 +1,6 @@
 'use strict';
 import { getDb } from './localdb';
-import { SearchHistory } from './types';
+import { SearchHistory, SearchItem } from './types';
 import * as API from './types/api';
 import { DupeEnum } from './types/api';
 
@@ -157,9 +157,9 @@ export const turnNicksIntoArray = (nicks: string): string[] => {
   return nicksArray;
 };
 
-export const buildSearchQuery = (item: { pattern_list: any; extensions: string; excluded: string; file_type: any; min_size: number; }, itemIndex = 0) => {
+export const buildSearchQuery = (item: SearchItem, singlePattern: string) => {
   return {
-    pattern: item.pattern_list.split('\n')[itemIndex],
+    pattern: singlePattern,
     extensions: item.extensions.split(';'),
     excluded: item.excluded.split(';'),
     file_type: item.file_type,
