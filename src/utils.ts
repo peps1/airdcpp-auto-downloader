@@ -200,7 +200,7 @@ export const searchHistoryStats = async (dbFilePath: string) => {
 };
 
 // if object with same pattern exists already, return the index in array
-export const getIndexToReplaceItem = (array: SearchHistory[], object: SearchHistory) => {
+export const getIndexForPattern = (array: SearchHistory[], object: SearchHistory) => {
   const index = array.findIndex((element) => element.pattern === object.pattern);
   return index;
 };
