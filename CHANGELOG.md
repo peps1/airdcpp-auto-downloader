@@ -1,5 +1,12 @@
 # Changelog
 
+## [v1.0.0-beta11](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.11) (2021-10-03)
+[Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.10...v1.0.0-beta.11)
+
+### Fixed
+* keep searching same item over and over
+* remove orphaned items from db
+
 ## [v1.0.0-beta10](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.10) (2021-10-03)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.9...v1.0.0-beta.10)
 
