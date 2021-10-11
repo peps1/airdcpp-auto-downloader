@@ -1,6 +1,16 @@
 # Changelog
 
-## [v1.0.0-beta11](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.11) (2021-10-03)
+## [v1.0.0-beta12](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.12) (2021-10-11)
+[Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.11...v1.0.0-beta.12)
+
+### Fixed
+* fixed missing await statement, that might have caused the db file to corrupt
+* return proper error message when the db can't be loaded on start
+
+### Changed
+* added some more and better logging
+
+## [v1.0.0-beta11](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.11) (2021-10-07)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.10...v1.0.0-beta.11)
 
 ### Fixed
@@ -46,7 +56,7 @@
 ## [v1.0.0-beta7](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.7) (2021-08-15)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.6...v1.0.0-beta.7)
 
-### Fix
+### Fixed
 * Priority IDs [#13](https://github.com/peps1/airdcpp-auto-downloader/issues/13)
 
 ## [v1.0.0-beta6](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.6) (2021-08-15)
