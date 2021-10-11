@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 // https://airdcpp.docs.apiary.io/#reference/private-chat-sessions/methods/send-status-message
 
 import { SeverityEnum } from 'types/api';
@@ -5,6 +6,7 @@ import { SeverityEnum } from 'types/api';
 // https://airdcpp.docs.apiary.io/#reference/hub-sessions/messages/send-status-message
 export const printStatusMessage = async (statusMessage: string, type: string, entityId: string|number) => {
   try {
+    // @ts-ignore: global breaking unit testing
     global.SOCKET.post(`${type}/${entityId}/status_message`, {
       text: statusMessage,
       severity: 'info',
@@ -25,19 +27,24 @@ export const printEvent = async (eventMessage: string, severity: SeverityEnum) =
 
   switch (severity) {
     case SeverityEnum.ERROR:
+      // @ts-ignore: global breaking unit testing
       global.SOCKET.logger.error(logMessage);
       break;
     case SeverityEnum.WARNING:
+      // @ts-ignore: global breaking unit testing
       global.SOCKET.logger.warn(logMessage);
       break;
     case SeverityEnum.INFO:
+      // @ts-ignore: global breaking unit testing
       global.SOCKET.logger.info(logMessage);
       break;
     case SeverityEnum.NOTIFY:
+      // @ts-ignore: global breaking unit testing
       global.SOCKET.logger.verbose(logMessage);
       break;
   };
 
+  // @ts-ignore: global breaking unit testing
   global.SOCKET.post('events', {
     text: eventMessage,
     severity,
