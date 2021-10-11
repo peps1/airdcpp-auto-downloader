@@ -113,7 +113,7 @@ const getOldestSearchHistory = async () => {
       // if found, return result
       if (searchItem.pattern_list.split('\n').some((pattern) => pattern === oldest.pattern)) {
         result = oldest;
-        db.save();
+        await db.save();
         return result;
       } else {
         // use variable so we iterate through everything before deciding if it should be deleted
