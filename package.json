@@ -1,6 +1,6 @@
 {
   "name": "airdcpp-auto-downloader",
-  "version": "1.0.0-beta.11",
+  "version": "1.0.0-beta.12",
   "description": "BETA TESTING: Extension to add search terms that will be searched in intervals and downloaded when found.",
   "homepage": "https://github.com/peps1/airdcpp-auto-downloader",
   "license": "MIT",
@@ -58,7 +58,7 @@
     "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
-    "eslint-plugin-jsdoc": "^36.1.0",
+    "eslint-plugin-jsdoc": "^36.1.1",
     "eslint-plugin-prefer-arrow": "^1.2.3",
     "eslint-plugin-react": "^7.26.1",
     "husky": "^7.0.2",
@@ -71,7 +71,7 @@
     "ts-loader": "^9.2.6",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3",
-    "webpack": "^5.57.1",
+    "webpack": "^5.58.1",
     "webpack-cli": "^4.9.0"
   },
   "main": "dist/main",
