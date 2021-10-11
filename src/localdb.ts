@@ -1,5 +1,7 @@
 
+import { printEvent } from 'log';
 import StormDB from 'stormdb';
+import { SeverityEnum } from 'types/api';
 
 export const getDb = async (dbFilePath: string) => {
 
@@ -12,7 +14,7 @@ export const getDb = async (dbFilePath: string) => {
 
     return dbObj;
   } catch (e) {
-    global.SOCKET.logger.error('ERROR: Problem loading db file');
+    printEvent(`${e}`, SeverityEnum.ERROR);
     throw (e);
   }
 

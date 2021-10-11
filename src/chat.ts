@@ -1,3 +1,4 @@
+import { SeverityEnum } from 'types/api';
 import { autoDlStats } from './commands/stats';
 import { printEvent, printStatusMessage } from './log';
 
@@ -17,7 +18,7 @@ export const sendChatMessage = (chatMessage: string, type: string, entityId: str
       text: chatMessage,
     });
   } catch (e) {
-    printEvent(`Failed to send: ${e}`, 'error');
+    printEvent(`Failed to send: ${e}`, SeverityEnum.ERROR);
   }
 
 };

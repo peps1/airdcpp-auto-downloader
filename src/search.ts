@@ -6,6 +6,7 @@ import { getSearchPattern, removeSearchPatternFromList } from './queue';
 import { printEvent } from './log';
 import { startDownload } from './download';
 import { getIndexForPattern } from './utils';
+import { SeverityEnum } from 'types/api';
 
 const onSearchResultAdded = (results: GroupedSearchResult[], result: any) => {
   results.push(result.result);
@@ -115,7 +116,7 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
   const db = await getDb(global.DbPath);
 
   // Show log message for the user
-  printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, 'info');
+  printEvent(`The item "${searchQueryPattern}" will be searched for on ${searchInfo.sent} hubs`, SeverityEnum.INFO);
 
 
   const newObj = {
@@ -195,9 +196,9 @@ const onSearchSent = async (searchItem: SearchItem, pattern: SearchPatternItem, 
         }
 
         if (wantQueueAll) {
-          printEvent(`Adding "${result.name}" to queue now.`, 'info');
+          printEvent(`Adding "${result.name}" to queue now.`, SeverityEnum.INFO);
         } else {
-          printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, 'info');
+          printEvent(`The item "${searchQueryPattern}" was found with ${results.length} results, adding best match "${result.name}" (Relevance: ${result.relevance}) to queue now.`, SeverityEnum.INFO);
         }
         startDownload(searchItem, pattern.searchItemId, instance, searchInfo, result);
       });

@@ -3,6 +3,7 @@ import { GroupedSearchResult, SearchInstance } from './types/api/search';
 import { printEvent } from './log';
 import { removeSearchPatternFromList } from './queue';
 import { toApiPriority } from './utils';
+import { SeverityEnum } from 'types/api';
 
 export const startDownload = async ( searchItem: SearchItem, listId: number, instance: SearchInstance, searchInfo: any, result: GroupedSearchResult, ) => {
   try {
@@ -14,6 +15,6 @@ export const startDownload = async ( searchItem: SearchItem, listId: number, ins
       removeSearchPatternFromList(searchInfo.query.pattern, listId);
     }
   } catch (error: any) {
-    printEvent(`ERROR: ${error.code} - ${error.message}`, 'error');
+    printEvent(`${error.code} - ${error.message}`, SeverityEnum.ERROR);
   }
 };
