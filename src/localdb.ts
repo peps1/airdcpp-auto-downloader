@@ -1,5 +1,5 @@
 
-import { printEvent } from 'log';
+import { printEvent } from './log';
 import StormDB from 'stormdb';
 import { SeverityEnum } from 'types/api';
 
