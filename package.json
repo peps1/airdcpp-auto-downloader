@@ -86,6 +86,6 @@
     "minApiFeatureLevel": 0
   },
   "dependencies": {
-    "stormdb": "^0.5.2"
+    "stormdb": "^0.6.0"
   }
 }
