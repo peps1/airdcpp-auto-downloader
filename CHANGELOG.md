@@ -1,5 +1,13 @@
 # Changelog
 
+## [v1.0.0-beta13](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.13) (2023-01-09)
+[Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.12...v1.0.0-beta.13)
+
+### Changed
+* replaced globalThis with global.
+* updated dependencies
+* updated README to add supported NodeJS version information
+
 ## [v1.0.0-beta12](https://github.com/peps1/airdcpp-auto-downloader/tree/v1.0.0-beta.12) (2021-10-11)
 [Full git log](https://github.com/peps1/airdcpp-auto-downloader/compare/v1.0.0-beta.11...v1.0.0-beta.12)
 
