@@ -2,6 +2,14 @@
 
 Extension to add search terms that will be searched in intervals and downloaded when found.
 
+## Supported NodeJS versions
+Though older NodeJS versions may work, only the versions in LTS or Maintenance status are supported.
+
+As of right now these are **18.x (LTS), 16.x (LTS), 14.x (LTS)**.
+
+See NodeJS documentation for up to date information: https://github.com/nodejs/release#release-schedule
+
+
 ## Known issues
 Changing the search interval requires stopping and starting the extension
 
