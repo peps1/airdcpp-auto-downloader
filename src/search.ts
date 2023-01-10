@@ -81,7 +81,7 @@ export const runSearch = async () => {
     }, instance.id
   );
 
-  const removeOnSearchSentListener = await globalThis.SOCKET.addListener(
+  const removeOnSearchSentListener = await global.SOCKET.addListener(
     'search',
     'search_hub_searches_sent',
     (searchInfo: any) => {
